@@ -1,10 +1,15 @@
-using System;
-using System.Windows.Forms;
-
 namespace PLCHESerialDebugger
 {
     public partial class PLCHESerialMonitorForm : Form
     {
+        private TextBox txtMonitorWrite { get; set; }
+
+        private TextBox txtMonitorRead { get; set; }
+
+        private TextBox txtTelemetry { get; set; }
+
+        public PLCGatewayController PLCGatewayController { get; set; }
+
         public PLCHESerialMonitorForm()
         {
             InitializeComponent(); // Ensures the designer-generated code runs
@@ -14,57 +19,57 @@ namespace PLCHESerialDebugger
         private void CreateDynamicControls()
         {
             // === Written Serial Data Window ===
-            var txtMonitorWrite = new TextBox
+            txtMonitorWrite = new TextBox
             {
                 Multiline = true,
                 ReadOnly = true,
                 ScrollBars = ScrollBars.Vertical,
-                Location = new System.Drawing.Point(10, 10),
-                Size = new System.Drawing.Size(350, 150),
+                Location = new Point(10, 10),
+                Size = new Size(350, 150),
                 BorderStyle = BorderStyle.FixedSingle,
-                BackColor = System.Drawing.Color.WhiteSmoke
+                BackColor = Color.WhiteSmoke
             };
             Controls.Add(txtMonitorWrite);
 
             // === Read Serial Data Window ===
-            var txtMonitorRead = new TextBox
+            txtMonitorRead = new TextBox
             {
                 Multiline = true,
                 ReadOnly = true,
                 ScrollBars = ScrollBars.Vertical,
-                Location = new System.Drawing.Point(370, 10),
-                Size = new System.Drawing.Size(350, 150),
+                Location = new Point(370, 10),
+                Size = new Size(350, 150),
                 BorderStyle = BorderStyle.FixedSingle,
-                BackColor = System.Drawing.Color.WhiteSmoke
+                BackColor = Color.WhiteSmoke
             };
             Controls.Add(txtMonitorRead);
 
             // === Telemetry Data Window ===
-            var txtTelemetry = new TextBox
+            txtTelemetry = new TextBox
             {
                 Multiline = true,
                 ReadOnly = true,
                 ScrollBars = ScrollBars.Vertical,
-                Location = new System.Drawing.Point(10, 170),
-                Size = new System.Drawing.Size(710, 100),
+                Location = new Point(10, 170),
+                Size = new Size(710, 100),
                 BorderStyle = BorderStyle.FixedSingle,
-                BackColor = System.Drawing.Color.WhiteSmoke
+                BackColor = Color.WhiteSmoke
             };
             Controls.Add(txtTelemetry);
 
             // === Command TextBox ===
             var txtCmdString = new TextBox
             {
-                Location = new System.Drawing.Point(10, 280),
-                Size = new System.Drawing.Size(350, 25)
+                Location = new Point(10, 280),
+                Size = new Size(350, 25)
             };
             Controls.Add(txtCmdString);
 
             // === Argument TextBox ===
             var txtCmdArg = new TextBox
             {
-                Location = new System.Drawing.Point(370, 280),
-                Size = new System.Drawing.Size(350, 25)
+                Location = new Point(370, 280),
+                Size = new Size(350, 25)
             };
             Controls.Add(txtCmdArg);
 
@@ -72,11 +77,12 @@ namespace PLCHESerialDebugger
             var btnSendCmd = new Button
             {
                 Text = "Send",
-                Location = new System.Drawing.Point(730, 280),
-                Size = new System.Drawing.Size(50, 25)
+                Location = new Point(730, 280),
+                Size = new Size(50, 25)
             };
             btnSendCmd.Click += (sender, args) =>
-                MessageBox.Show($"Sending Command: {txtCmdString.Text}, Arg: {txtCmdArg.Text}");
+            MessageBox.Show($"Sending Command: {txtCmdString.Text}, Arg: {txtCmdArg.Text}");
+            btnSendCmd.Click += BtnSendCmd_Click;
             Controls.Add(btnSendCmd);
 
             // === Status Panels ===
@@ -87,31 +93,35 @@ namespace PLCHESerialDebugger
             var chkPollingEnabled = new CheckBox
             {
                 Text = "Enable Polling",
-                Location = new System.Drawing.Point(10, 500),
-                Size = new System.Drawing.Size(150, 25)
+                Location = new Point(10, 500),
+                Size = new Size(150, 25)
             };
+            chkPollingEnabled.CheckedChanged += ChkPollingEnabled_CheckedChanged;
             Controls.Add(chkPollingEnabled);
 
             // === Init Serial Port Button ===
             var btnInitSerial = new Button
             {
                 Text = "Init Serial",
-                Location = new System.Drawing.Point(200, 500),
-                Size = new System.Drawing.Size(100, 30)
+                Location = new Point(200, 500),
+                Size = new Size(100, 30)
             };
             btnInitSerial.Click += (sender, args) =>
-                MessageBox.Show("Serial port initialized.");
+            MessageBox.Show("Serial port initialized.");
+            btnInitSerial.Click += BtnInitSerial_Click;
             Controls.Add(btnInitSerial);
 
             // === Dispose Serial Port Button ===
             var btnDisposeSerial = new Button
             {
                 Text = "Dispose Serial",
-                Location = new System.Drawing.Point(320, 500),
-                Size = new System.Drawing.Size(100, 30)
+                Location = new Point(320, 500),
+                Size = new Size(100, 30)
             };
             btnDisposeSerial.Click += (sender, args) =>
-                MessageBox.Show("Serial port disposed.");
+            MessageBox.Show("Serial port disposed.");
+            btnDisposeSerial.Click += BtnDisposeSerial_Click;
+
             Controls.Add(btnDisposeSerial);
         }
 
@@ -119,8 +129,8 @@ namespace PLCHESerialDebugger
         {
             var panel = new Panel
             {
-                Location = new System.Drawing.Point(x, y),
-                Size = new System.Drawing.Size(350, 150),
+                Location = new Point(x, y),
+                Size = new Size(350, 150),
                 BorderStyle = BorderStyle.FixedSingle
             };
 
@@ -128,8 +138,8 @@ namespace PLCHESerialDebugger
             {
                 Text = labelText,
                 Dock = DockStyle.Top,
-                TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
-                Font = new System.Drawing.Font("Arial", 10, System.Drawing.FontStyle.Bold)
+                TextAlign = ContentAlignment.MiddleCenter,
+                Font = new Font("Arial", 10, FontStyle.Bold)
             };
 
             panel.Controls.Add(label);
@@ -141,12 +151,69 @@ namespace PLCHESerialDebugger
                 {
                     Text = $"Bit {i}: --",
                     AutoSize = true,
-                    Location = new System.Drawing.Point(10, 20 + (i * 20))
+                    Location = new Point(10, 20 + (i * 20))
                 };
                 panel.Controls.Add(bitLabel);
             }
 
             return panel;
+        }
+
+        // move this stuff into a different file since 
+        private void ChkPollingEnabled_CheckedChanged(object sender, EventArgs e)
+        {
+            var checkBox = sender as CheckBox;
+            if (checkBox != null)
+            {
+                bool isChecked = checkBox.Checked;
+                MessageBox.Show($"Polling is now {(isChecked ? "enabled" : "disabled")}");
+                // Add logic to enable/disable the serial polling thread
+            }
+        }
+
+        private void BtnInitSerial_Click(object sender, EventArgs e)
+        {
+            // Logic to initialize serial port
+        }
+
+        private void BtnDisposeSerial_Click(object sender, EventArgs e)
+        {
+            // Logic to dispose of serial port
+        }
+
+        private void BtnSendCmd_Click(object sender, EventArgs e)
+        {
+            // Logic to send command
+        }
+
+        private void AppendToTextbox(TextBox textbox, string message)
+        {
+            if (textbox.InvokeRequired)
+            {
+                textbox.Invoke(new Action(() => AppendToTextbox(textbox, message)));
+            }
+            else
+            {
+                textbox.AppendText($"{DateTime.Now}: {message}{Environment.NewLine}");
+            }
+        }
+
+        public void UpdateTxData(string data)
+        {
+            AppendToTextbox(txtMonitorWrite, data);
+            // should utilize data binding to populate textbox
+        }
+
+        public void UpdateRxData(string data)
+        {
+            AppendToTextbox(txtMonitorRead, data);
+            // should utilize data binding to populate textbox
+        }
+
+        public void UpdateTelemetryData(string parameter, string value)
+        {
+            AppendToTextbox(txtTelemetry, $"{parameter}: {value}");
+            // should utilize data binding to populate textbox
         }
     }
 }
