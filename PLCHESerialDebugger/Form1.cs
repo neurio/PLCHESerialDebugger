@@ -2,11 +2,17 @@ namespace PLCHESerialDebugger
 {
     public partial class PLCHESerialMonitorForm : Form
     {
-        private TextBox txtMonitorWrite { get; set; }
+        public TextBox txtMonitorWrite { get; set; }
 
-        private TextBox txtMonitorRead { get; set; }
+        public TextBox txtMonitorRead { get; set; }
 
-        private TextBox txtTelemetry { get; set; }
+        public TextBox txtTelemetry { get; set; }
+
+        public TextBox txtCmdString { get; set; }
+
+        public TextBox txtCmdArgument { get; set; }
+
+        public CheckBox chkEnableSerial { get; set; }
 
         public PLCGatewayController PLCGatewayController { get; set; }
 
@@ -58,7 +64,7 @@ namespace PLCHESerialDebugger
             Controls.Add(txtTelemetry);
 
             // === Command TextBox ===
-            var txtCmdString = new TextBox
+            txtCmdString = new TextBox
             {
                 Location = new Point(10, 280),
                 Size = new Size(350, 25)
@@ -66,12 +72,12 @@ namespace PLCHESerialDebugger
             Controls.Add(txtCmdString);
 
             // === Argument TextBox ===
-            var txtCmdArg = new TextBox
+            txtCmdArgument = new TextBox
             {
                 Location = new Point(370, 280),
                 Size = new Size(350, 25)
             };
-            Controls.Add(txtCmdArg);
+            Controls.Add(txtCmdArgument);
 
             // === Send Button ===
             var btnSendCmd = new Button
@@ -81,7 +87,7 @@ namespace PLCHESerialDebugger
                 Size = new Size(50, 25)
             };
             btnSendCmd.Click += (sender, args) =>
-            MessageBox.Show($"Sending Command: {txtCmdString.Text}, Arg: {txtCmdArg.Text}");
+            MessageBox.Show($"Sending Command: {txtCmdString.Text}, Arg: {txtCmdArgument.Text}");
             btnSendCmd.Click += BtnSendCmd_Click;
             Controls.Add(btnSendCmd);
 
@@ -123,6 +129,21 @@ namespace PLCHESerialDebugger
             btnDisposeSerial.Click += BtnDisposeSerial_Click;
 
             Controls.Add(btnDisposeSerial);
+
+            chkEnableSerial = new CheckBox
+            {
+                Location = new Point(10, 350), // Adjust position as needed
+                Size = new Size(200, 30),     // Adjust size as needed
+                Text = "Enable Option",       // Display text
+                Checked = false               // Default state
+            };
+
+            // Add an event handler for the CheckedChanged event
+            chkEnableSerial.CheckedChanged += ChkEnableSerial_CheckedChanged;
+
+            // Add the CheckBox to the form
+            this.Controls.Add(chkEnableSerial);
+
         }
 
         private Panel CreateStatusPanel(string labelText, int x, int y)
@@ -171,8 +192,24 @@ namespace PLCHESerialDebugger
             }
         }
 
+        // Event handler for CheckBox toggle
+        private void ChkEnableSerial_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkEnableSerial.Checked)
+            {
+                MessageBox.Show("Serial PLCHE Selected!", "CheckBox State");
+                PLCGatewayController.UpdatePLCGatewayType(PLCGatewayController.PLCGatewayType.SerialPLCHE);
+            }
+            else
+            {
+                MessageBox.Show("CP110 Selected!", "CheckBox State");
+                PLCGatewayController.UpdatePLCGatewayType(PLCGatewayController.PLCGatewayType.CP110);
+            }
+        }
+
         private void BtnInitSerial_Click(object sender, EventArgs e)
         {
+            PLCGatewayController.InitializePLCGateway();
             // Logic to initialize serial port
         }
 
@@ -184,6 +221,10 @@ namespace PLCHESerialDebugger
         private void BtnSendCmd_Click(object sender, EventArgs e)
         {
             // Logic to send command
+            string cmdString = txtCmdArgument.Text;
+            string cmdArgument = txtCmdArgument.Text;
+            string textData = $"{cmdString} {cmdArgument}";
+            PLCGatewayController.SendPLCGatewayPacket(textData);
         }
 
         private void AppendToTextbox(TextBox textbox, string message)
