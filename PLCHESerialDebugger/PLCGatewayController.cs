@@ -6,6 +6,9 @@ namespace PLCHESerialDebugger
 {
     public class PLCGatewayController
     {
+        // should perform *ALL* IPLCGateway mutator operations from within PLCGatewayController --- this keeps the code very transferrable between projects
+        // functions called via GUI action of course
+
         public PLCGatewayController()
         {
             // not much to do in constructor..
@@ -33,6 +36,35 @@ namespace PLCHESerialDebugger
         public Dictionary<string, KeyValuePair<int, byte[]>> UDPInputBufferCached { get; set; } = new Dictionary<string, KeyValuePair<int, byte[]>>();
 
         public PLCGatewayType ActivePLCGatewayType { get; set; } = PLCGatewayType.SerialPLCHE;
+        
+        public bool PersistentPollingEnabled { get; set; } = false;
+
+        public void EnablePersistentPolling()
+        {
+            try
+            {
+                PLCGateway.BeginPersistentPolling();
+                PersistentPollingEnabled = true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+
+        public void DisablePersistentPolling()
+        {
+            try
+            {
+                PLCGateway.AbortPersistentPolling();
+                PersistentPollingEnabled = false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
 
         public void UpdatePLCGatewayType(PLCGatewayType gatewayType)
         {
@@ -93,68 +125,77 @@ namespace PLCHESerialDebugger
         // not much sense in generalizing this cp110/serialplche single packet transmission, as required commands will be called via a GUI control
         public void SendPLCGatewayPacket(string textData) // for Serial PLCHE
         {
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            Console.WriteLine($"{timestamp}: Writing {textData}");
             PLCGateway.WriteRawString(textData);
-            // should perform *ALL* IPLCGateway operations from within PLCGatewayController- this keeps the code very transferrable between projects
-            // functions called via UI action of course
         }
 
-        public void ReceivePLCGatewayPacket()
+        public string ReadAndUpdateInputBuffer()
         {
-            CacheInputBuffer();
-            ParseInputBuffer();
-        }
+            string newEntries = string.Empty;
 
-        public void ParseInputBuffer()
-        {
             switch (ActivePLCGatewayType)
             {
                 case PLCGatewayType.CP110:
-                {
+                    {
+                        var UDPPLCGateway = PLCGateway as CP110Gateway;
 
-                    break;
-                }
+                        if (UDPPLCGateway != null)
+                        {
+                            newEntries = GetNewDictionaryEntries(UDPInputBufferCached, UDPPLCGateway.InputBuffer);
+                            UDPInputBufferCached = new Dictionary<string, KeyValuePair<int, byte[]>>(UDPPLCGateway.InputBuffer);
+                        }
+
+                        break;
+                    }
+
                 case PLCGatewayType.SerialPLCHE:
-                {
+                    {
+                        var SerialPLCHEGateway = PLCGateway as SerialPLCHE;
 
-                    break;
-                }
+                        if (SerialPLCHEGateway != null)
+                        {
+                            newEntries = GetNewListEntries(SerialInputBufferCached, SerialPLCHEGateway.InputBuffer);
+                            SerialInputBufferCached = new List<string>(SerialPLCHEGateway.InputBuffer);
+                        }
+
+                        break;
+                    }
             }
+
+            return newEntries;
         }
 
-        public void CacheInputBuffer()
+        private string GetNewDictionaryEntries(Dictionary<string, KeyValuePair<int, byte[]>> oldBuffer, Dictionary<string, KeyValuePair<int, byte[]>> newBuffer)
         {
-            switch (ActivePLCGatewayType)
+            var changes = new List<string>();
+
+            foreach (var key in newBuffer.Keys)
             {
-                case PLCGatewayType.CP110:
+                if (!oldBuffer.ContainsKey(key))
                 {
-                    var UDPPLCGateway = PLCGateway as CP110Gateway;
-
-                    if (UDPPLCGateway != null)
-                    {
-                        if (UDPInputBufferCached != UDPPLCGateway.InputBuffer)
-                        {
-                            UDPInputBufferCached = UDPPLCGateway.InputBuffer;
-                        }
-                    }
-
-                    break;
-                }
-
-                case PLCGatewayType.SerialPLCHE:
-                {
-                    var SerialPLCHEGateway = PLCGateway as SerialPLCHE;
-
-                    if (SerialPLCHEGateway != null)
-                    {
-                        if (SerialInputBufferCached != SerialPLCHEGateway.InputBuffer)
-                        {
-                            SerialInputBufferCached = SerialPLCHEGateway.InputBuffer;
-                        }
-                    }
-
-                    break;
+                    var entry = newBuffer[key];
+                    string pageDataHex = BitConverter.ToString(entry.Value).Replace("-", " ");
+                    changes.Add($"New Entry: Timestamp = {key}, Page# = {entry.Key}, PageData = {pageDataHex}");
                 }
             }
+
+            return string.Join(Environment.NewLine, changes);
+        }
+
+        private string GetNewListEntries(List<string> oldBuffer, List<string> newBuffer)
+        {
+            var changes = new List<string>();
+
+            foreach (var item in newBuffer)
+            {
+                if (!oldBuffer.Contains(item))
+                {
+                    changes.Add($"New Entry: {item}");
+                }
+            }
+
+            return string.Join(Environment.NewLine, changes);
         }
     }
 }

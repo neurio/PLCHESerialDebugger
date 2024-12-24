@@ -14,12 +14,29 @@ namespace PLCHESerialDebugger
 
         public CheckBox chkEnableSerial { get; set; }
 
+        public System.Windows.Forms.Timer UIUpdateTimer { get; set; } = new System.Windows.Forms.Timer();
+
         public PLCGatewayController PLCGatewayController { get; set; }
 
         public PLCHESerialMonitorForm()
         {
             InitializeComponent(); // Ensures the designer-generated code runs
+            ResizeFormTo80Percent(0.8f);
             CreateDynamicControls(); // Add our dynamic controls
+            PLCGatewayController = new PLCGatewayController();
+        }
+
+        public void ResizeFormTo80Percent(float scalingRatio)
+        {
+            var screenWidth = Screen.PrimaryScreen.WorkingArea.Width;
+            var screenHeight = Screen.PrimaryScreen.WorkingArea.Height;
+
+            int formWidth = (int)(screenWidth * scalingRatio);
+            int formHeight = (int)(screenHeight * scalingRatio);
+
+            this.Size = new Size(formWidth, formHeight);
+
+            this.StartPosition = FormStartPosition.CenterScreen;
         }
 
         private void CreateDynamicControls()
@@ -138,12 +155,13 @@ namespace PLCHESerialDebugger
                 Checked = false               // Default state
             };
 
-            // Add an event handler for the CheckedChanged event
             chkEnableSerial.CheckedChanged += ChkEnableSerial_CheckedChanged;
 
-            // Add the CheckBox to the form
-            this.Controls.Add(chkEnableSerial);
+            Controls.Add(chkEnableSerial);
 
+            // UI Update Timer
+            UIUpdateTimer.Interval = 100; // Set interval to 100ms
+            UIUpdateTimer.Tick += UIUpdateTimer_Tick; // Add event handler for the Tick event
         }
 
         private Panel CreateStatusPanel(string labelText, int x, int y)
@@ -180,19 +198,45 @@ namespace PLCHESerialDebugger
             return panel;
         }
 
-        // move this stuff into a different file since 
+        // Timer Tick event handler
+        private void UIUpdateTimer_Tick(object sender, EventArgs e)
+        {
+            if (PLCGatewayController.PersistentPollingEnabled == true)
+            {
+                string newRXData = PLCGatewayController.ReadAndUpdateInputBuffer(); // should only write new entries
+
+                if (newRXData != null || newRXData != string.Empty)
+                {
+                    AppendToTextbox(txtMonitorRead, newRXData);
+                }
+            }
+        }
+
         private void ChkPollingEnabled_CheckedChanged(object sender, EventArgs e)
         {
+
+
+
             var checkBox = sender as CheckBox;
+
             if (checkBox != null)
             {
                 bool isChecked = checkBox.Checked;
                 MessageBox.Show($"Polling is now {(isChecked ? "enabled" : "disabled")}");
-                // Add logic to enable/disable the serial polling thread
+
+                if (isChecked)
+                {
+                    PLCGatewayController.EnablePersistentPolling();
+                    UIUpdateTimer.Start();
+                }
+                else
+                {
+                    PLCGatewayController.DisablePersistentPolling();
+                    UIUpdateTimer.Stop();
+                }
             }
         }
 
-        // Event handler for CheckBox toggle
         private void ChkEnableSerial_CheckedChanged(object sender, EventArgs e)
         {
             if (chkEnableSerial.Checked)
@@ -210,17 +254,15 @@ namespace PLCHESerialDebugger
         private void BtnInitSerial_Click(object sender, EventArgs e)
         {
             PLCGatewayController.InitializePLCGateway();
-            // Logic to initialize serial port
         }
 
         private void BtnDisposeSerial_Click(object sender, EventArgs e)
         {
-            // Logic to dispose of serial port
+            PLCGatewayController.DeinitializePLCGateway();
         }
 
         private void BtnSendCmd_Click(object sender, EventArgs e)
         {
-            // Logic to send command
             string cmdString = txtCmdArgument.Text;
             string cmdArgument = txtCmdArgument.Text;
             string textData = $"{cmdString} {cmdArgument}";
