@@ -85,9 +85,15 @@ namespace PLCHESerialDebugger
 
         public void DeinitializePLCGateway()
         {
-            Console.WriteLine($"Closing {PLCGateway.GetType()}");
-            PLCGateway.Close();
-            // PLCGateway.Dispose(); // dispose should be called internally only
+            try
+            {
+                Console.WriteLine($"Closing {PLCGateway.GetType()}");
+                PLCGateway.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine (ex.ToString());
+            }
         }
 
         public void InitializePLCGateway()

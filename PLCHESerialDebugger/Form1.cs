@@ -42,121 +42,73 @@ namespace PLCHESerialDebugger
         private void CreateDynamicControls()
         {
             // === Written Serial Data Window ===
-            txtMonitorWrite = new TextBox
-            {
-                Multiline = true,
-                ReadOnly = true,
-                ScrollBars = ScrollBars.Vertical,
-                Location = new Point(10, 10),
-                Size = new Size(350, 150),
-                BorderStyle = BorderStyle.FixedSingle,
-                BackColor = Color.WhiteSmoke
-            };
+            var lblMonitorWrite = CreateLabel("Written Data", 0.01f, 0.01f);
+            Controls.Add(lblMonitorWrite);
+            txtMonitorWrite = CreateTextBox(0.01f, 0.06f, 0.35f, 0.15f);
             Controls.Add(txtMonitorWrite);
 
             // === Read Serial Data Window ===
-            txtMonitorRead = new TextBox
-            {
-                Multiline = true,
-                ReadOnly = true,
-                ScrollBars = ScrollBars.Vertical,
-                Location = new Point(370, 10),
-                Size = new Size(350, 150),
-                BorderStyle = BorderStyle.FixedSingle,
-                BackColor = Color.WhiteSmoke
-            };
+            var lblMonitorRead = CreateLabel("Read Data", 0.37f, 0.01f);
+            Controls.Add(lblMonitorRead);
+            txtMonitorRead = CreateTextBox(0.37f, 0.06f, 0.35f, 0.15f);
             Controls.Add(txtMonitorRead);
 
             // === Telemetry Data Window ===
-            txtTelemetry = new TextBox
-            {
-                Multiline = true,
-                ReadOnly = true,
-                ScrollBars = ScrollBars.Vertical,
-                Location = new Point(10, 170),
-                Size = new Size(710, 100),
-                BorderStyle = BorderStyle.FixedSingle,
-                BackColor = Color.WhiteSmoke
-            };
+            var lblTelemetry = CreateLabel("Telemetry Data", 0.01f, 0.17f);
+            Controls.Add(lblTelemetry);
+            txtTelemetry = CreateTextBox(0.01f, 0.22f, 0.7f, 0.1f);
             Controls.Add(txtTelemetry);
 
             // === Command TextBox ===
-            txtCmdString = new TextBox
-            {
-                Location = new Point(10, 280),
-                Size = new Size(350, 25)
-            };
+            var lblCmdString = CreateLabel("Command String", 0.01f, 0.33f);
+            Controls.Add(lblCmdString);
+            txtCmdString = CreateTextBox(0.01f, 0.37f, 0.35f, 0.03f);
             Controls.Add(txtCmdString);
 
             // === Argument TextBox ===
-            txtCmdArgument = new TextBox
-            {
-                Location = new Point(370, 280),
-                Size = new Size(350, 25)
-            };
+            var lblCmdArgument = CreateLabel("Argument String", 0.37f, 0.33f);
+            Controls.Add(lblCmdArgument);
+            txtCmdArgument = CreateTextBox(0.37f, 0.37f, 0.35f, 0.03f);
             Controls.Add(txtCmdArgument);
 
             // === Send Button ===
-            var btnSendCmd = new Button
-            {
-                Text = "Send",
-                Location = new Point(730, 280),
-                Size = new Size(50, 25)
-            };
-            btnSendCmd.Click += (sender, args) =>
-            MessageBox.Show($"Sending Command: {txtCmdString.Text}, Arg: {txtCmdArgument.Text}");
+            var btnSendCmd = CreateButton("Send", 0.73f, 0.37f, 0.07f, 0.03f);
             btnSendCmd.Click += BtnSendCmd_Click;
             Controls.Add(btnSendCmd);
 
             // === Status Panels ===
-            Controls.Add(CreateStatusPanel("Status Word 1", 10, 320));
-            Controls.Add(CreateStatusPanel("Status Word 2", 370, 320));
+            var lblStatusWord1 = CreateLabel("Status Word 1", 0.01f, 0.45f);
+            Controls.Add(lblStatusWord1);
+            Controls.Add(CreateStatusPanel("Status Word 1", 0.01f, 0.5f));
 
-            // === Check Polling Checkbox ===
-            var chkPollingEnabled = new CheckBox
-            {
-                Text = "Enable Polling",
-                Location = new Point(10, 500),
-                Size = new Size(150, 25)
-            };
+            var lblStatusWord2 = CreateLabel("Status Word 2", 0.37f, 0.45f);
+            Controls.Add(lblStatusWord2);
+            Controls.Add(CreateStatusPanel("Status Word 2", 0.37f, 0.5f));
+
+            // === Polling Checkbox ===
+            var lblPollingEnabled = CreateLabel("Polling Active", 0.01f, 0.65f);
+            Controls.Add(lblPollingEnabled);
+            var chkPollingEnabled = CreateCheckBox("Enable Polling", 0.01f, 0.69f, 0.15f, 0.03f);
             chkPollingEnabled.CheckedChanged += ChkPollingEnabled_CheckedChanged;
             Controls.Add(chkPollingEnabled);
 
             // === Init Serial Port Button ===
-            var btnInitSerial = new Button
-            {
-                Text = "Init Serial",
-                Location = new Point(200, 500),
-                Size = new Size(100, 30)
-            };
-            btnInitSerial.Click += (sender, args) =>
-            MessageBox.Show("Serial port initialized.");
+            var lblInitSerial = CreateLabel("Initialize Serial Port", 0.2f, 0.65f);
+            Controls.Add(lblInitSerial);
+            var btnInitSerial = CreateButton("Init Serial", 0.2f, 0.69f, 0.1f, 0.04f);
             btnInitSerial.Click += BtnInitSerial_Click;
             Controls.Add(btnInitSerial);
 
             // === Dispose Serial Port Button ===
-            var btnDisposeSerial = new Button
-            {
-                Text = "Dispose Serial",
-                Location = new Point(320, 500),
-                Size = new Size(100, 30)
-            };
-            btnDisposeSerial.Click += (sender, args) =>
-            MessageBox.Show("Serial port disposed.");
+            var lblDisposeSerial = CreateLabel("Dispose Serial Port", 0.32f, 0.65f);
+            Controls.Add(lblDisposeSerial);
+            var btnDisposeSerial = CreateButton("Dispose Serial", 0.32f, 0.69f, 0.1f, 0.04f);
             btnDisposeSerial.Click += BtnDisposeSerial_Click;
-
             Controls.Add(btnDisposeSerial);
 
-            chkEnableSerial = new CheckBox
-            {
-                Location = new Point(10, 350), // Adjust position as needed
-                Size = new Size(200, 30),     // Adjust size as needed
-                Text = "Enable Option",       // Display text
-                Checked = false               // Default state
-            };
-
+            // === Enable Serial Checkbox ===
+            chkEnableSerial = CreateCheckBox("Serial Comm.", 0.01f, 0.82f, 0.2f, 0.04f);
             chkEnableSerial.CheckedChanged += ChkEnableSerial_CheckedChanged;
-
             Controls.Add(chkEnableSerial);
 
             // UI Update Timer
@@ -164,38 +116,74 @@ namespace PLCHESerialDebugger
             UIUpdateTimer.Tick += UIUpdateTimer_Tick; // Add event handler for the Tick event
         }
 
-        private Panel CreateStatusPanel(string labelText, int x, int y)
+        private TextBox CreateTextBox(float xRatio, float yRatio, float widthRatio, float heightRatio)
+        {
+            var txtBox = new TextBox
+            {
+                Multiline = true,
+                ReadOnly = true,
+                ScrollBars = ScrollBars.Vertical,
+                Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
+                Size = new Size((int)(this.ClientSize.Width * widthRatio), (int)(this.ClientSize.Height * heightRatio)),
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.WhiteSmoke
+            };
+            return txtBox;
+        }
+
+        private Button CreateButton(string text, float xRatio, float yRatio, float widthRatio, float heightRatio)
+        {
+            var button = new Button
+            {
+                Text = text,
+                Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
+                Size = new Size((int)(this.ClientSize.Width * widthRatio), (int)(this.ClientSize.Height * heightRatio))
+            };
+            return button;
+        }
+
+        private CheckBox CreateCheckBox(string text, float xRatio, float yRatio, float widthRatio, float heightRatio)
+        {
+            var chkBox = new CheckBox
+            {
+                Text = text,
+                Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
+                Size = new Size((int)(this.ClientSize.Width * widthRatio), (int)(this.ClientSize.Height * heightRatio))
+            };
+            return chkBox;
+        }
+
+        private Panel CreateStatusPanel(string label, float xRatio, float yRatio)
         {
             var panel = new Panel
             {
-                Location = new Point(x, y),
-                Size = new Size(350, 150),
-                BorderStyle = BorderStyle.FixedSingle
+                Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
+                Size = new Size((int)(this.ClientSize.Width * 0.35f), (int)(this.ClientSize.Height * 0.15f)),
+                BorderStyle = BorderStyle.FixedSingle,
             };
 
-            var label = new Label
+            var lblStatus = new Label
             {
-                Text = labelText,
-                Dock = DockStyle.Top,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Font = new Font("Arial", 10, FontStyle.Bold)
+                Text = label,
+                Location = new Point(10, 10),
+                Size = new Size(panel.Width - 20, 20)
             };
+            panel.Controls.Add(lblStatus);
 
-            panel.Controls.Add(label);
-
-            // Placeholder for status bits
-            for (int i = 0; i < 32; i++)
-            {
-                var bitLabel = new Label
-                {
-                    Text = $"Bit {i}: --",
-                    AutoSize = true,
-                    Location = new Point(10, 20 + (i * 20))
-                };
-                panel.Controls.Add(bitLabel);
-            }
+            // You can add more controls (like Bit Fields) here
 
             return panel;
+        }
+
+        private Label CreateLabel(string text, float xRatio, float yRatio)
+        {
+            var lbl = new Label
+            {
+                Text = text,
+                Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
+                AutoSize = true
+            };
+            return lbl;
         }
 
         // Timer Tick event handler
