@@ -9,9 +9,9 @@ namespace PLCHESerialDebugger
         // should perform *ALL* IPLCGateway mutator operations from within PLCGatewayController --- this keeps the code very transferrable between projects
         // functions called via GUI action of course
 
-        public PLCGatewayController()
+        public PLCGatewayController(LogController logController)
         {
-            // not much to do in constructor..
+            LogController = logController;
         }
 
         public enum PLCGatewayType
@@ -39,16 +39,19 @@ namespace PLCHESerialDebugger
         
         public bool PersistentPollingEnabled { get; set; } = false;
 
+        public LogController LogController { get; set; }
+
         public void EnablePersistentPolling()
         {
             try
             {
                 PLCGateway.BeginPersistentPolling();
                 PersistentPollingEnabled = true;
+                LogController.AddLogMessage(new LogMessage(text: $"Persistent Polling Enabled", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                LogController.AddLogMessage(new LogMessage(text: $"{ex.ToString()}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
             }
         }
 
@@ -59,10 +62,11 @@ namespace PLCHESerialDebugger
             {
                 PLCGateway.AbortPersistentPolling();
                 PersistentPollingEnabled = false;
+                LogController.AddLogMessage(new LogMessage(text: $"Persistent Polling Disabled", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                LogController.AddLogMessage(new LogMessage(text: $"{ex.ToString()}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
             }
         }
 
@@ -87,12 +91,12 @@ namespace PLCHESerialDebugger
         {
             try
             {
-                Console.WriteLine($"Closing {PLCGateway.GetType()}");
+                LogController.AddLogMessage(new LogMessage(text: $"Closing {PLCGateway.GetType()}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
                 PLCGateway.Close();
             }
             catch (Exception ex)
             {
-                Console.WriteLine (ex.ToString());
+                LogController.AddLogMessage(new LogMessage(text: $"{ex.ToString()}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
             }
         }
 
@@ -119,20 +123,19 @@ namespace PLCHESerialDebugger
                         }
                 }
 
-                Console.WriteLine($"{PLCGateway.GetType()} init. and ready to use.");
+                LogController.AddLogMessage(new LogMessage(text: $"{PLCGateway.GetType()} init. and ready to use.", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
-                Console.WriteLine("PLCGateway not initialized; some issue occurred.");
+                LogController.AddLogMessage(new LogMessage(text: $"{ex.ToString()}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+                LogController.AddLogMessage(new LogMessage(text: $"PLCGateway not initialized; some issue occurred.", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
             }
         }
 
         // not much sense in generalizing this cp110/serialplche single packet transmission, as required commands will be called via a GUI control
         public void SendPLCGatewayPacket(string textData) // for Serial PLCHE
         {
-            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-            Console.WriteLine($"{timestamp}: Writing {textData}");
+            LogController.AddLogMessage(new LogMessage(text: $"Writing {textData}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
             PLCGateway.WriteRawString(textData);
         }
 
@@ -149,7 +152,7 @@ namespace PLCHESerialDebugger
                         if (UDPPLCGateway != null)
                         {
                             newEntries = GetNewDictionaryEntries(UDPInputBufferCached, UDPPLCGateway.InputBuffer);
-                            UDPInputBufferCached = new Dictionary<string, KeyValuePair<int, byte[]>>(UDPPLCGateway.InputBuffer);
+                            UDPInputBufferCached = UDPPLCGateway.InputBuffer;
                         }
 
                         break;
@@ -162,13 +165,14 @@ namespace PLCHESerialDebugger
                         if (SerialPLCHEGateway != null)
                         {
                             newEntries = GetNewListEntries(SerialInputBufferCached, SerialPLCHEGateway.InputBuffer);
-                            SerialInputBufferCached = new List<string>(SerialPLCHEGateway.InputBuffer);
+                            SerialInputBufferCached = SerialPLCHEGateway.InputBuffer;
                         }
 
                         break;
                     }
             }
 
+            LogController.AddLogMessage(new LogMessage(text: $"{newEntries}", messageType: LogMessage.messageType.Serial, timeStamp: DateTime.UtcNow));
             return newEntries;
         }
 

@@ -18,12 +18,15 @@ namespace PLCHESerialDebugger
 
         public PLCGatewayController PLCGatewayController { get; set; }
 
+        public LogController LogController { get; set; }
+
         public PLCHESerialMonitorForm()
         {
             InitializeComponent(); // Ensures the designer-generated code runs
             ResizeFormTo80Percent(0.8f);
             CreateDynamicControls(); // Add our dynamic controls
-            PLCGatewayController = new PLCGatewayController();
+            LogController = new LogController();
+            PLCGatewayController = new PLCGatewayController(LogController);
         }
 
         public void ResizeFormTo80Percent(float scalingRatio)
@@ -201,10 +204,7 @@ namespace PLCHESerialDebugger
         }
 
         private void ChkPollingEnabled_CheckedChanged(object sender, EventArgs e)
-        {
-
-
-
+        { 
             var checkBox = sender as CheckBox;
 
             if (checkBox != null)
