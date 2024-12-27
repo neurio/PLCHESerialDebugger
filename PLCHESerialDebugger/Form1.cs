@@ -18,6 +18,10 @@ namespace PLCHESerialDebugger
 
         public CheckBox chkEnableSerial { get; set; }
 
+        public CheckBox chkPollingEnabled { get; set; }
+
+        public Button btnSendCmd { get; set; }
+
         public System.Windows.Forms.Timer UIUpdateTimer { get; set; } = new System.Windows.Forms.Timer();
 
         public PLCGatewayController PLCGatewayController { get; set; }
@@ -33,6 +37,7 @@ namespace PLCHESerialDebugger
             PLCGatewayController = new PLCGatewayController(LogController);
             AttachDataSources();
             AttachCustomEventHandlers();
+            LockSerialControls();
         }
 
         public void AttachCustomEventHandlers()
@@ -79,79 +84,79 @@ namespace PLCHESerialDebugger
             var lblSystemLog = CreateLabel("System Log", 0.01f, 0.01f);
             Controls.Add(lblSystemLog);
 
-            ListBoxSystemLog = CreateListBox(0.37f, 0.06f, 0.35f, 0.15f);
+            ListBoxSystemLog = CreateListBox(0.01f, 0.05f, 0.98f, 0.12f); // Occupy full width at the top
             Controls.Add(ListBoxSystemLog);
 
             // === Written Serial Data Window ===
-            var lblMonitorWrite = CreateLabel("Written Data", 0.01f, 0.01f);
+            var lblMonitorWrite = CreateLabel("Written Data", 0.01f, 0.18f);
             Controls.Add(lblMonitorWrite);
 
-            ListBoxTXMonitor = CreateListBox(0.37f, 0.06f, 0.35f, 0.15f);
+            ListBoxTXMonitor = CreateListBox(0.01f, 0.22f, 0.48f, 0.15f); // Left half of the width
             Controls.Add(ListBoxTXMonitor);
 
             // === Read Serial Data Window ===
-            var lblMonitorRead = CreateLabel("Read Data", 0.37f, 0.01f);
+            var lblMonitorRead = CreateLabel("Read Data", 0.51f, 0.18f);
             Controls.Add(lblMonitorRead);
 
-            ListBoxRXMonitor = CreateListBox(0.37f, 0.06f, 0.35f, 0.15f);
+            ListBoxRXMonitor = CreateListBox(0.51f, 0.22f, 0.48f, 0.15f); // Right half of the width
             Controls.Add(ListBoxRXMonitor);
 
             // === Telemetry Data Window ===
-            var lblTelemetry = CreateLabel("Telemetry Data", 0.01f, 0.17f);
+            var lblTelemetry = CreateLabel("Telemetry Data", 0.01f, 0.40f);
             Controls.Add(lblTelemetry);
 
-            ListBoxTelemetryMonitor = CreateListBox(0.01f, 0.22f, 0.7f, 0.1f);
+            ListBoxTelemetryMonitor = CreateListBox(0.01f, 0.44f, 0.98f, 0.1f); // Full width
             Controls.Add(ListBoxTelemetryMonitor);
 
             // === Command TextBox ===
-            var lblCmdString = CreateLabel("Command String", 0.01f, 0.33f);
+            var lblCmdString = CreateLabel("Command String", 0.01f, 0.56f);
             Controls.Add(lblCmdString);
-            txtCmdString = CreateTextBox(0.01f, 0.37f, 0.35f, 0.03f);
+            txtCmdString = CreateTextBox(0.01f, 0.60f, 0.48f, 0.03f); // Reduced width
             Controls.Add(txtCmdString);
 
             // === Argument TextBox ===
-            var lblCmdArgument = CreateLabel("Argument String", 0.37f, 0.33f);
+            var lblCmdArgument = CreateLabel("Argument String", 0.51f, 0.56f);
             Controls.Add(lblCmdArgument);
-            txtCmdArgument = CreateTextBox(0.37f, 0.37f, 0.35f, 0.03f);
+            txtCmdArgument = CreateTextBox(0.51f, 0.60f, 0.48f, 0.03f); // Reduced width
             Controls.Add(txtCmdArgument);
 
             // === Send Button ===
-            var btnSendCmd = CreateButton("Send", 0.73f, 0.37f, 0.07f, 0.03f);
+            btnSendCmd = CreateButton("Send", 0.91f, 0.7f / this.ClientSize.Height, 0.08f, 0.03f);
             btnSendCmd.Click += BtnSendCmd_Click;
             Controls.Add(btnSendCmd);
 
             // === Status Panels ===
-            var lblStatusWord1 = CreateLabel("Status Word 1", 0.01f, 0.45f);
+            var lblStatusWord1 = CreateLabel("Status Word 1", 0.01f, 0.74f);
             Controls.Add(lblStatusWord1);
-            Controls.Add(CreateStatusPanel("Status Word 1", 0.01f, 0.5f));
+            Controls.Add(CreateStatusPanel("Status Word 1", 0.01f, 0.78f, 0.48f, 0.035f)); // Reduced height for compactness
 
-            var lblStatusWord2 = CreateLabel("Status Word 2", 0.37f, 0.45f);
+            var lblStatusWord2 = CreateLabel("Status Word 2", 0.51f, 0.74f);
             Controls.Add(lblStatusWord2);
-            Controls.Add(CreateStatusPanel("Status Word 2", 0.37f, 0.5f));
+            Controls.Add(CreateStatusPanel("Status Word 2", 0.51f, 0.78f, 0.48f, 0.035f)); // Reduced height for compactness
 
             // === Polling Checkbox ===
-            var lblPollingEnabled = CreateLabel("Polling Active", 0.01f, 0.65f);
+            var lblPollingEnabled = CreateLabel("Polling Active", 0.01f, 0.82f);
             Controls.Add(lblPollingEnabled);
-            var chkPollingEnabled = CreateCheckBox("Enable Polling", 0.01f, 0.69f, 0.15f, 0.03f);
+            chkPollingEnabled = CreateCheckBox("Enable Polling", 0.01f, 0.86f, 0.2f, 0.04f); // Adjusted position
             chkPollingEnabled.CheckedChanged += ChkPollingEnabled_CheckedChanged;
             Controls.Add(chkPollingEnabled);
 
             // === Init Serial Port Button ===
-            var lblInitSerial = CreateLabel("Initialize Serial Port", 0.2f, 0.65f);
+            var lblInitSerial = CreateLabel("Initialize Serial Port", 0.21f, 0.82f);
             Controls.Add(lblInitSerial);
-            var btnInitSerial = CreateButton("Init Serial", 0.2f, 0.69f, 0.1f, 0.04f);
+            var btnInitSerial = CreateButton("Init Serial", 0.21f, 0.86f, 0.1f, 0.04f);
             btnInitSerial.Click += BtnInitSerial_Click;
             Controls.Add(btnInitSerial);
 
             // === Dispose Serial Port Button ===
-            var lblDisposeSerial = CreateLabel("Dispose Serial Port", 0.32f, 0.65f);
+            var lblDisposeSerial = CreateLabel("Dispose Serial Port", 0.34f, 0.82f);
             Controls.Add(lblDisposeSerial);
-            var btnDisposeSerial = CreateButton("Dispose Serial", 0.32f, 0.69f, 0.1f, 0.04f);
+            var btnDisposeSerial = CreateButton("Dispose Serial", 0.34f, 0.86f, 0.1f, 0.04f);
             btnDisposeSerial.Click += BtnDisposeSerial_Click;
             Controls.Add(btnDisposeSerial);
 
             // === Enable Serial Checkbox ===
-            chkEnableSerial = CreateCheckBox("Serial Comm.", 0.01f, 0.82f, 0.2f, 0.04f);
+            chkEnableSerial = CreateCheckBox("Serial Comm.", 0.47f, 0.86f, 0.2f, 0.04f); // Placed closer to other controls
             chkEnableSerial.CheckedChanged += ChkEnableSerial_CheckedChanged;
             Controls.Add(chkEnableSerial);
 
@@ -159,6 +164,9 @@ namespace PLCHESerialDebugger
             UIUpdateTimer.Interval = 100; // Set interval to 100ms
             UIUpdateTimer.Tick += UIUpdateTimer_Tick; // Add event handler for the Tick event
         }
+
+
+
 
         private ListBox CreateListBox(float xRatio, float yRatio, float widthRatio, float heightRatio)
         {
@@ -179,18 +187,17 @@ namespace PLCHESerialDebugger
 
         private TextBox CreateTextBox(float xRatio, float yRatio, float widthRatio, float heightRatio)
         {
-            var txtBox = new TextBox
+            var textBox = new TextBox
             {
-                Multiline = true,
-                ReadOnly = true,
-                ScrollBars = ScrollBars.Vertical,
                 Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
                 Size = new Size((int)(this.ClientSize.Width * widthRatio), (int)(this.ClientSize.Height * heightRatio)),
-                BorderStyle = BorderStyle.FixedSingle,
-                BackColor = Color.WhiteSmoke
+                Multiline = false,  // Ensure it's single-line and prevent scrollbars
+                ScrollBars = ScrollBars.None,  // Disable scrollbars
             };
-            return txtBox;
+
+            return textBox;
         }
+
 
         private Button CreateButton(string text, float xRatio, float yRatio, float widthRatio, float heightRatio)
         {
@@ -214,12 +221,12 @@ namespace PLCHESerialDebugger
             return chkBox;
         }
 
-        private Panel CreateStatusPanel(string label, float xRatio, float yRatio)
+        private Panel CreateStatusPanel(string label, float xRatio, float yRatio, float widthRatio, float heightRatio)
         {
             var panel = new Panel
             {
                 Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
-                Size = new Size((int)(this.ClientSize.Width * 0.35f), (int)(this.ClientSize.Height * 0.15f)),
+                Size = new Size((int)(this.ClientSize.Width * widthRatio), (int)(this.ClientSize.Height * heightRatio)),
                 BorderStyle = BorderStyle.FixedSingle,
             };
 
@@ -231,10 +238,14 @@ namespace PLCHESerialDebugger
             };
             panel.Controls.Add(lblStatus);
 
-            // You can add more controls (like Bit Fields) here
+            // Add more controls or placeholders inside this panel
+            // Adjust sizes to match the content
 
             return panel;
         }
+
+
+
 
         private Label CreateLabel(string text, float xRatio, float yRatio)
         {
@@ -300,16 +311,41 @@ namespace PLCHESerialDebugger
         private void BtnInitSerial_Click(object sender, EventArgs e)
         {
             PLCGatewayController.InitializePLCGateway();
+            UnlockSerialControls();
+
+        }
+
+        private void UnlockSerialControls()
+        {
+            if (PLCGatewayController.GatewayInit)
+            {
+                txtCmdString.Enabled = true;
+                txtCmdArgument.Enabled = true;
+                chkPollingEnabled.Enabled = true;
+                btnSendCmd.Enabled = true;
+            }
+        }
+
+        private void LockSerialControls()
+        {
+            if (!PLCGatewayController.GatewayInit)
+            {
+                txtCmdString.Enabled = false;
+                txtCmdArgument.Enabled = false;
+                chkPollingEnabled.Enabled = false;
+                btnSendCmd.Enabled = false;
+            }
         }
 
         private void BtnDisposeSerial_Click(object sender, EventArgs e)
         {
             PLCGatewayController.DeinitializePLCGateway();
+            LockSerialControls();
         }
 
         private void BtnSendCmd_Click(object sender, EventArgs e)
         {
-            string cmdString = txtCmdArgument.Text;
+            string cmdString = txtCmdString.Text;
             string cmdArgument = txtCmdArgument.Text;
             string textData = $"{cmdString} {cmdArgument}";
 
