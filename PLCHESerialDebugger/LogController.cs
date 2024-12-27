@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.VisualBasic.Logging;
+using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace PLCHESerialDebugger
 {
@@ -25,9 +27,11 @@ namespace PLCHESerialDebugger
 
         public static int LastSyncedSystemBaseDataIndex { get; set; } = 0;
 
+        private static readonly Regex logPattern = new Regex(@"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}:\d{3}): (.+)$");
 
         public void AddLogMessage(LogMessage message)
         {
+
             Console.WriteLine($"{message.TimeStamp}: {message.Text}");
 
             switch (message.MessageType)
@@ -50,9 +54,17 @@ namespace PLCHESerialDebugger
                     }
                 case LogMessage.messageType.Serial:
                 {
-                    SerialLog.Add(message);
-                    SyncSerialDataBindingLog(); // For GUI
-                    break;
+                        Match match = logPattern.Match(message.Text);
+                        if(match.Success)
+                        {
+                            SerialLog.Add(message);
+                            SyncSerialDataBindingLog(); // For GUI
+                            //string timestamp = match.Groups[1].Value;
+                            //string messageText = match.Groups[2].Value;
+                        }
+
+
+                        break;
                 }
             }
         }
@@ -62,7 +74,7 @@ namespace PLCHESerialDebugger
             for (int x = LastSyncedSerialDataIndex; x < SerialLog.Count; x++)
             {
                 var logMessage = SerialLog[x];
-                string formattedLog = $"{logMessage.TimeStamp}: {logMessage.Text}";
+                string formattedLog = $"{logMessage.Text}";
                 SerialDataBindingLog.Add(formattedLog);
             }
 
