@@ -1,12 +1,16 @@
+using System.ComponentModel;
+
 namespace PLCHESerialDebugger
 {
     public partial class PLCHESerialMonitorForm : Form
     {
-        public TextBox txtMonitorWrite { get; set; }
+        public ListBox ListBoxRXMonitor { get; set; }
 
-        public TextBox txtMonitorRead { get; set; }
+        public ListBox ListBoxTXMonitor { get; set; }
 
-        public TextBox txtTelemetry { get; set; }
+        public ListBox ListBoxSystemLog { get; set; }
+
+        public ListBox ListBoxTelemetryMonitor { get; set; }
 
         public TextBox txtCmdString { get; set; }
 
@@ -27,6 +31,33 @@ namespace PLCHESerialDebugger
             CreateDynamicControls(); // Add our dynamic controls
             LogController = new LogController();
             PLCGatewayController = new PLCGatewayController(LogController);
+            AttachDataSources();
+            AttachCustomEventHandlers();
+        }
+
+        public void AttachCustomEventHandlers()
+        {
+            LogController.SerialDataBindingLog.ListChanged += SerialDataBindingLog_ListChanged;
+            LogController.SystemBaseDataBindingLog.ListChanged += SystemBaseDataBindingLog_ListChanged;
+
+            ListBoxRXMonitor.DataSource = bindingSourceRXData;
+            ListBoxSystemLog.DataSource = bindingSourceSystemBaseData;
+        }
+
+        public void SerialDataBindingLog_ListChanged(object sender, ListChangedEventArgs e)
+        {
+            // run nuanced GUI update logic here
+        }
+
+        public void SystemBaseDataBindingLog_ListChanged(object sender, ListChangedEventArgs e)
+        {
+            // run naunced GUI update logic here
+        }
+
+        public void AttachDataSources()
+        {
+            bindingSourceRXData.DataSource = LogController.SerialDataBindingLog;
+            bindingSourceSystemBaseData.DataSource = LogController.SystemBaseDataBindingLog;
         }
 
         public void ResizeFormTo80Percent(float scalingRatio)
@@ -44,23 +75,33 @@ namespace PLCHESerialDebugger
 
         private void CreateDynamicControls()
         {
+            // === System Transaction Window ===
+            var lblSystemLog = CreateLabel("System Log", 0.01f, 0.01f);
+            Controls.Add(lblSystemLog);
+
+            ListBoxSystemLog = CreateListBox(0.37f, 0.06f, 0.35f, 0.15f);
+            Controls.Add(ListBoxSystemLog);
+
             // === Written Serial Data Window ===
             var lblMonitorWrite = CreateLabel("Written Data", 0.01f, 0.01f);
             Controls.Add(lblMonitorWrite);
-            txtMonitorWrite = CreateTextBox(0.01f, 0.06f, 0.35f, 0.15f);
-            Controls.Add(txtMonitorWrite);
+
+            ListBoxTXMonitor = CreateListBox(0.37f, 0.06f, 0.35f, 0.15f);
+            Controls.Add(ListBoxTXMonitor);
 
             // === Read Serial Data Window ===
             var lblMonitorRead = CreateLabel("Read Data", 0.37f, 0.01f);
             Controls.Add(lblMonitorRead);
-            txtMonitorRead = CreateTextBox(0.37f, 0.06f, 0.35f, 0.15f);
-            Controls.Add(txtMonitorRead);
+
+            ListBoxRXMonitor = CreateListBox(0.37f, 0.06f, 0.35f, 0.15f);
+            Controls.Add(ListBoxRXMonitor);
 
             // === Telemetry Data Window ===
             var lblTelemetry = CreateLabel("Telemetry Data", 0.01f, 0.17f);
             Controls.Add(lblTelemetry);
-            txtTelemetry = CreateTextBox(0.01f, 0.22f, 0.7f, 0.1f);
-            Controls.Add(txtTelemetry);
+
+            ListBoxTelemetryMonitor = CreateListBox(0.01f, 0.22f, 0.7f, 0.1f);
+            Controls.Add(ListBoxTelemetryMonitor);
 
             // === Command TextBox ===
             var lblCmdString = CreateLabel("Command String", 0.01f, 0.33f);
@@ -118,6 +159,23 @@ namespace PLCHESerialDebugger
             UIUpdateTimer.Interval = 100; // Set interval to 100ms
             UIUpdateTimer.Tick += UIUpdateTimer_Tick; // Add event handler for the Tick event
         }
+
+        private ListBox CreateListBox(float xRatio, float yRatio, float widthRatio, float heightRatio)
+        {
+            var listBox = new ListBox
+            {
+                Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
+                Size = new Size((int)(this.ClientSize.Width * widthRatio), (int)(this.ClientSize.Height * heightRatio)),
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.WhiteSmoke
+            };
+
+            // Enable scrolling if items exceed visible area
+            listBox.HorizontalScrollbar = true;
+
+            return listBox;
+        }
+
 
         private TextBox CreateTextBox(float xRatio, float yRatio, float widthRatio, float heightRatio)
         {
@@ -198,13 +256,13 @@ namespace PLCHESerialDebugger
 
                 if (newRXData != null || newRXData != string.Empty)
                 {
-                    AppendToTextbox(txtMonitorRead, newRXData);
+                    // do UI update if needed 
                 }
             }
         }
 
         private void ChkPollingEnabled_CheckedChanged(object sender, EventArgs e)
-        { 
+        {
             var checkBox = sender as CheckBox;
 
             if (checkBox != null)
@@ -254,7 +312,16 @@ namespace PLCHESerialDebugger
             string cmdString = txtCmdArgument.Text;
             string cmdArgument = txtCmdArgument.Text;
             string textData = $"{cmdString} {cmdArgument}";
-            PLCGatewayController.SendPLCGatewayPacket(textData);
+
+            try
+            {
+                LogController.AddLogMessage(new LogMessage(text: $"Writing {textData}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+                PLCGatewayController.SendPLCGatewayPacket(textData);
+            }
+            catch (Exception ex)
+            {
+                LogController.AddLogMessage(new LogMessage(text: $"{ex.ToString()}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            }
         }
 
         private void AppendToTextbox(TextBox textbox, string message)
@@ -269,22 +336,14 @@ namespace PLCHESerialDebugger
             }
         }
 
-        public void UpdateTxData(string data)
+        private void bindingSourceRXData_CurrentChanged(object sender, EventArgs e)
         {
-            AppendToTextbox(txtMonitorWrite, data);
-            // should utilize data binding to populate textbox
+
         }
 
-        public void UpdateRxData(string data)
+        private void bindingSourceSystemBaseData_CurrentChanged(object sender, EventArgs e)
         {
-            AppendToTextbox(txtMonitorRead, data);
-            // should utilize data binding to populate textbox
-        }
 
-        public void UpdateTelemetryData(string parameter, string value)
-        {
-            AppendToTextbox(txtTelemetry, $"{parameter}: {value}");
-            // should utilize data binding to populate textbox
         }
     }
 }

@@ -28,12 +28,36 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Form1";
+            components = new System.ComponentModel.Container();
+            bindingSourceRXData = new BindingSource(components);
+            bindingSourceSystemBaseData = new BindingSource(components);
+            ((System.ComponentModel.ISupportInitialize)bindingSourceRXData).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)bindingSourceSystemBaseData).BeginInit();
+            SuspendLayout();
+            // 
+            // bindingSourceRXData
+            // 
+            bindingSourceRXData.CurrentChanged += bindingSourceRXData_CurrentChanged;
+            // 
+            // bindingSourceSystemBaseData
+            // 
+            bindingSourceSystemBaseData.CurrentChanged += bindingSourceSystemBaseData_CurrentChanged;
+            // 
+            // PLCHESerialMonitorForm
+            // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(800, 450);
+            Name = "PLCHESerialMonitorForm";
+            Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)bindingSourceRXData).EndInit();
+            ((System.ComponentModel.ISupportInitialize)bindingSourceSystemBaseData).EndInit();
+            ResumeLayout(false);
         }
 
         #endregion
+
+        private BindingSource bindingSourceRXData;
+        private BindingSource bindingSourceSystemBaseData;
     }
 }

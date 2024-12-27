@@ -1,4 +1,6 @@
-﻿namespace PLCHESerialDebugger
+﻿using System.ComponentModel;
+
+namespace PLCHESerialDebugger
 {
     public class LogController // better to remain non-static 
     {
@@ -15,6 +17,15 @@
 
         public List<LogMessage> SerialLog = new List<LogMessage>();
 
+        public BindingList<string> SerialDataBindingLog { get; set; } = new BindingList<string>();
+
+        public BindingList<string> SystemBaseDataBindingLog { get; set; } = new BindingList<string>();
+
+        public static int LastSyncedSerialDataIndex { get; set; } = 0;
+
+        public static int LastSyncedSystemBaseDataIndex { get; set; } = 0;
+
+
         public void AddLogMessage(LogMessage message)
         {
             Console.WriteLine($"{message.TimeStamp}: {message.Text}");
@@ -24,6 +35,7 @@
                 case LogMessage.messageType.Base:
                     {
                         BaseLog.Add(message);
+                        SyncSystemBaseDataBindingLog(); // For GUI
                         break;
                     }
                 case LogMessage.messageType.VISA:
@@ -39,9 +51,34 @@
                 case LogMessage.messageType.Serial:
                 {
                     SerialLog.Add(message);
+                    SyncSerialDataBindingLog(); // For GUI
                     break;
                 }
             }
+        }
+
+        public void SyncSerialDataBindingLog()
+        {
+            for (int x = LastSyncedSerialDataIndex; x < SerialLog.Count; x++)
+            {
+                var logMessage = SerialLog[x];
+                string formattedLog = $"{logMessage.TimeStamp}: {logMessage.Text}";
+                SerialDataBindingLog.Add(formattedLog);
+            }
+
+            LastSyncedSerialDataIndex = SerialLog.Count; // Update the synced index
+        }
+
+        public void SyncSystemBaseDataBindingLog()
+        {
+            for (int x = LastSyncedSystemBaseDataIndex; x < SerialLog.Count; x++)
+            {
+                var logMessage = BaseLog[x];
+                string formattedLog = $"{logMessage.TimeStamp}: {logMessage.Text}";
+                SystemBaseDataBindingLog.Add(formattedLog);
+            }
+
+            LastSyncedSystemBaseDataIndex = BaseLog.Count; // Update the synced index
         }
     }
 
