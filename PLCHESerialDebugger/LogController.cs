@@ -71,7 +71,7 @@ namespace PLCHESerialDebugger
 
         public void SyncSystemBaseDataBindingLog()
         {
-            for (int x = LastSyncedSystemBaseDataIndex; x < SerialLog.Count; x++)
+            for (int x = LastSyncedSystemBaseDataIndex; x < BaseLog.Count; x++)
             {
                 var logMessage = BaseLog[x];
                 string formattedLog = $"{logMessage.TimeStamp}: {logMessage.Text}";

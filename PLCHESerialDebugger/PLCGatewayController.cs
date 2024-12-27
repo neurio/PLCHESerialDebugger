@@ -33,7 +33,7 @@ namespace PLCHESerialDebugger
 
         public List<String> SerialInputBufferCached { get; set; } = new List<string>();
 
-        public Dictionary<string, KeyValuePair<int, byte[]>> UDPInputBufferCached { get; set; } = new Dictionary<string, KeyValuePair<int, byte[]>>();
+        public Dictionary<string, KeyValuePair<int, byte[]>> UDPInputBufferCached { get; set; } = new Dictionary<string, KeyValuePair<int, byte[]>>(); // <timestamp, <page #, page data>>
 
         public PLCGatewayType ActivePLCGatewayType { get; set; } = PLCGatewayType.SerialPLCHE;
         
@@ -93,6 +93,7 @@ namespace PLCHESerialDebugger
             {
                 LogController.AddLogMessage(new LogMessage(text: $"Closing {PLCGateway.GetType()}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
                 PLCGateway.Close();
+                GatewayInit = false;
             }
             catch (Exception ex)
             {
@@ -123,6 +124,7 @@ namespace PLCHESerialDebugger
                         }
                 }
 
+                GatewayInit = true;
                 LogController.AddLogMessage(new LogMessage(text: $"{PLCGateway.GetType()} init. and ready to use.", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
             }
             catch (Exception ex)
@@ -135,7 +137,7 @@ namespace PLCHESerialDebugger
         // not much sense in generalizing this cp110/serialplche single packet transmission, as required commands will be called via a GUI control
         public void SendPLCGatewayPacket(string textData) // for Serial PLCHE
         {
-            LogController.AddLogMessage(new LogMessage(text: $"Writing {textData}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            //LogController.AddLogMessage(new LogMessage(text: $"Writing {textData}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
             PLCGateway.WriteRawString(textData);
         }
 

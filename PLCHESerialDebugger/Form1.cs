@@ -16,7 +16,7 @@ namespace PLCHESerialDebugger
 
         public TextBox txtCmdArgument { get; set; }
 
-        public CheckBox chkEnableSerial { get; set; }
+        public CheckBox chkTogglePLCGatewayType { get; set; }
 
         public CheckBox chkPollingEnabled { get; set; }
 
@@ -156,9 +156,9 @@ namespace PLCHESerialDebugger
             Controls.Add(btnDisposeSerial);
 
             // === Enable Serial Checkbox ===
-            chkEnableSerial = CreateCheckBox("Serial Comm.", 0.47f, 0.86f, 0.2f, 0.04f); // Placed closer to other controls
-            chkEnableSerial.CheckedChanged += ChkEnableSerial_CheckedChanged;
-            Controls.Add(chkEnableSerial);
+            chkTogglePLCGatewayType = CreateCheckBox("Serial Comm.", 0.47f, 0.86f, 0.2f, 0.04f); // Placed closer to other controls
+            chkTogglePLCGatewayType.CheckedChanged += ChkTogglePLCGatewayType_CheckedChanged;
+            Controls.Add(chkTogglePLCGatewayType);
 
             // UI Update Timer
             UIUpdateTimer.Interval = 100; // Set interval to 100ms
@@ -294,17 +294,19 @@ namespace PLCHESerialDebugger
             }
         }
 
-        private void ChkEnableSerial_CheckedChanged(object sender, EventArgs e)
+        private void ChkTogglePLCGatewayType_CheckedChanged(object sender, EventArgs e)
         {
-            if (chkEnableSerial.Checked)
+            if (chkTogglePLCGatewayType.Checked)
             {
                 MessageBox.Show("Serial PLCHE Selected!", "CheckBox State");
                 PLCGatewayController.UpdatePLCGatewayType(PLCGatewayController.PLCGatewayType.SerialPLCHE);
+                chkTogglePLCGatewayType.Text = "Serial PLCHE";
             }
             else
             {
                 MessageBox.Show("CP110 Selected!", "CheckBox State");
                 PLCGatewayController.UpdatePLCGatewayType(PLCGatewayController.PLCGatewayType.CP110);
+                chkTogglePLCGatewayType.Text = "CP110";
             }
         }
 
@@ -323,6 +325,7 @@ namespace PLCHESerialDebugger
                 txtCmdArgument.Enabled = true;
                 chkPollingEnabled.Enabled = true;
                 btnSendCmd.Enabled = true;
+                chkTogglePLCGatewayType.Enabled = false;
             }
         }
 
@@ -334,6 +337,7 @@ namespace PLCHESerialDebugger
                 txtCmdArgument.Enabled = false;
                 chkPollingEnabled.Enabled = false;
                 btnSendCmd.Enabled = false;
+                chkTogglePLCGatewayType.Enabled = true;
             }
         }
 
