@@ -141,6 +141,11 @@ namespace PLCHESerialDebugger
             PLCGateway.WriteRawString(textData);
         }
 
+        public string RetrievePLCGatewayPacket()
+        {
+            return PLCGateway.ReadRawString();
+        }
+
         public string ReadAndUpdateInputBuffer()
         {
             string newEntries = string.Empty;

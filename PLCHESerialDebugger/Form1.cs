@@ -357,6 +357,11 @@ namespace PLCHESerialDebugger
             {
                 LogController.AddLogMessage(new LogMessage(text: $"Writing {textData}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
                 PLCGatewayController.SendPLCGatewayPacket(textData);
+                Thread.Sleep(100);
+                string rxData = PLCGatewayController.RetrievePLCGatewayPacket();
+                LogController.AddLogMessage(new LogMessage(text: $"Received: {rxData}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+
+                // need to trigger monitor serial port for new entry after hitting send cmd
             }
             catch (Exception ex)
             {
