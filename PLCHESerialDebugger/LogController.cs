@@ -32,7 +32,7 @@ namespace PLCHESerialDebugger
         public void AddLogMessage(LogMessage message)
         {
 
-            Console.WriteLine($"{message.TimeStamp}: {message.Text}");
+            Console.WriteLine($"{message.Text}");
 
             switch (message.MessageType)
             {
@@ -110,10 +110,17 @@ namespace PLCHESerialDebugger
             Serial,
         }
 
-        public LogMessage(string text, messageType messageType, DateTime timeStamp)
+        public LogMessage(string text, messageType messageType, DateTime timeStamp, bool? useTimeStamp = false)
         {
             TimeStamp = timeStamp.ToString("yyyy-MM-dd HH:mm:ss:FFF");
-            Text = $"{TimeStamp}: {text}";
+            if (useTimeStamp == true)
+            {
+                Text = $"{TimeStamp}: {text}";
+            }
+            else
+            {
+                Text = text;
+            }
             MessageType = messageType;
         }
     }

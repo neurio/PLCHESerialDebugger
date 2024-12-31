@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CP110Library" Version="1.1.0" />
+    <PackageReference Include="CP110Library" Version="1.1.2" />
   </ItemGroup>
 
 </Project>

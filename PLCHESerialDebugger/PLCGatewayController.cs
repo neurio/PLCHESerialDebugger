@@ -141,9 +141,11 @@ namespace PLCHESerialDebugger
             PLCGateway.WriteRawString(textData);
         }
 
-        public string RetrievePLCGatewayPacket()
+        public async Task<string> RetrievePLCGatewayPacket()
         {
-            return PLCGateway.ReadRawString();
+            string returnValue = await PLCGateway.ReadRawString();
+            LogController.AddLogMessage(new LogMessage(text: $" {returnValue}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            return returnValue;
         }
 
         public string ReadAndUpdateInputBuffer()

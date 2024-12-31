@@ -347,7 +347,7 @@ namespace PLCHESerialDebugger
             LockSerialControls();
         }
 
-        private void BtnSendCmd_Click(object sender, EventArgs e)
+        private async void BtnSendCmd_Click(object sender, EventArgs e)
         {
             string cmdString = txtCmdString.Text;
             string cmdArgument = txtCmdArgument.Text;
@@ -355,13 +355,13 @@ namespace PLCHESerialDebugger
 
             try
             {
-                LogController.AddLogMessage(new LogMessage(text: $"Writing {textData}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+                LogController.AddLogMessage(new LogMessage(text: $"Writing {textData}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow, useTimeStamp: true));
                 PLCGatewayController.SendPLCGatewayPacket(textData);
                 Thread.Sleep(100);
-                string rxData = PLCGatewayController.RetrievePLCGatewayPacket();
-                LogController.AddLogMessage(new LogMessage(text: $"Received: {rxData}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
 
-                // need to trigger monitor serial port for new entry after hitting send cmd
+                string rxData = await PLCGatewayController.RetrievePLCGatewayPacket();
+
+                //PLCGatewayController.RetrievePLCGatewayPacket();
             }
             catch (Exception ex)
             {
