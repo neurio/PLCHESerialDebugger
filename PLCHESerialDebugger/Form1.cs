@@ -45,7 +45,6 @@ namespace PLCHESerialDebugger
             LogController.SerialDataBindingLog.ListChanged += SerialDataBindingLog_ListChanged;
             LogController.SystemBaseDataBindingLog.ListChanged += SystemBaseDataBindingLog_ListChanged;
 
-            ListBoxRXMonitor.DataSource = bindingSourceRXData;
             ListBoxSystemLog.DataSource = bindingSourceSystemBaseData;
         }
 
@@ -84,22 +83,8 @@ namespace PLCHESerialDebugger
             var lblSystemLog = CreateLabel("System Log", 0.01f, 0.01f);
             Controls.Add(lblSystemLog);
 
-            ListBoxSystemLog = CreateListBox(0.01f, 0.05f, 0.98f, 0.12f); // Occupy full width at the top
+            ListBoxSystemLog = CreateListBox(0.01f, 0.05f, 0.98f, 0.35f); // Occupy full width at the top
             Controls.Add(ListBoxSystemLog);
-
-            // === Written Serial Data Window ===
-            var lblMonitorWrite = CreateLabel("Written Data", 0.01f, 0.18f);
-            Controls.Add(lblMonitorWrite);
-
-            ListBoxTXMonitor = CreateListBox(0.01f, 0.22f, 0.48f, 0.15f); // Left half of the width
-            Controls.Add(ListBoxTXMonitor);
-
-            // === Read Serial Data Window ===
-            var lblMonitorRead = CreateLabel("Read Data", 0.51f, 0.18f);
-            Controls.Add(lblMonitorRead);
-
-            ListBoxRXMonitor = CreateListBox(0.51f, 0.22f, 0.48f, 0.15f); // Right half of the width
-            Controls.Add(ListBoxRXMonitor);
 
             // === Telemetry Data Window ===
             var lblTelemetry = CreateLabel("Telemetry Data", 0.01f, 0.40f);
