@@ -4,9 +4,7 @@ namespace PLCHESerialDebugger
 {
     public partial class PLCHESerialMonitorForm : Form
     {
-        public ListBox ListBoxRXMonitor { get; set; }
-
-        public ListBox ListBoxTXMonitor { get; set; }
+        public ComboBox ComboBoxForCOMPorts { get; set; }
 
         public ListBox ListBoxSystemLog { get; set; }
 
@@ -45,7 +43,6 @@ namespace PLCHESerialDebugger
             LogController.SerialDataBindingLog.ListChanged += SerialDataBindingLog_ListChanged;
             LogController.SystemBaseDataBindingLog.ListChanged += SystemBaseDataBindingLog_ListChanged;
 
-            ListBoxRXMonitor.DataSource = bindingSourceRXData;
             ListBoxSystemLog.DataSource = bindingSourceSystemBaseData;
         }
 
@@ -84,22 +81,8 @@ namespace PLCHESerialDebugger
             var lblSystemLog = CreateLabel("System Log", 0.01f, 0.01f);
             Controls.Add(lblSystemLog);
 
-            ListBoxSystemLog = CreateListBox(0.01f, 0.05f, 0.98f, 0.12f); // Occupy full width at the top
+            ListBoxSystemLog = CreateListBox(0.01f, 0.05f, 0.98f, 0.35f); // Occupy full width at the top
             Controls.Add(ListBoxSystemLog);
-
-            // === Written Serial Data Window ===
-            var lblMonitorWrite = CreateLabel("Written Data", 0.01f, 0.18f);
-            Controls.Add(lblMonitorWrite);
-
-            ListBoxTXMonitor = CreateListBox(0.01f, 0.22f, 0.48f, 0.15f); // Left half of the width
-            Controls.Add(ListBoxTXMonitor);
-
-            // === Read Serial Data Window ===
-            var lblMonitorRead = CreateLabel("Read Data", 0.51f, 0.18f);
-            Controls.Add(lblMonitorRead);
-
-            ListBoxRXMonitor = CreateListBox(0.51f, 0.22f, 0.48f, 0.15f); // Right half of the width
-            Controls.Add(ListBoxRXMonitor);
 
             // === Telemetry Data Window ===
             var lblTelemetry = CreateLabel("Telemetry Data", 0.01f, 0.40f);
@@ -134,6 +117,10 @@ namespace PLCHESerialDebugger
             Controls.Add(lblStatusWord2);
             Controls.Add(CreateStatusPanel("Status Word 2", 0.51f, 0.78f, 0.48f, 0.035f)); // Reduced height for compactness
 
+            // === COM Port Selections ===
+            ComboBoxForCOMPorts = CreateComboBox(0.65f, 0.85f, 0.05f, 0.1f);
+            Controls.Add(ComboBoxForCOMPorts);
+
             // === Polling Checkbox ===
             var lblPollingEnabled = CreateLabel("Polling Active", 0.01f, 0.82f);
             Controls.Add(lblPollingEnabled);
@@ -165,7 +152,33 @@ namespace PLCHESerialDebugger
             UIUpdateTimer.Tick += UIUpdateTimer_Tick; // Add event handler for the Tick event
         }
 
+        private ComboBox CreateComboBox(float xRatio, float yRatio, float widthRatio, float heightRatio)
+        {
+            var comboBox = new ComboBox
+            {
+                Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
+                Size = new Size((int)(this.ClientSize.Width * widthRatio), (int)(this.ClientSize.Height * heightRatio)),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                BackColor = Color.WhiteSmoke
+            };
 
+            return comboBox;
+        }
+
+        private void PopulateComboBox(ComboBox comboBox, IEnumerable<string> items)
+        {
+            comboBox.Items.Clear(); // Clear any existing items
+            foreach (var item in items)
+            {
+                comboBox.Items.Add(item);
+            }
+
+            // Set default selected index if items exist
+            if (comboBox.Items.Count > 0)
+            {
+                comboBox.SelectedIndex = 0;
+            }
+        }
 
 
         private ListBox CreateListBox(float xRatio, float yRatio, float widthRatio, float heightRatio)
