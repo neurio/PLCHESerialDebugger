@@ -4,9 +4,7 @@ namespace PLCHESerialDebugger
 {
     public partial class PLCHESerialMonitorForm : Form
     {
-        public ListBox ListBoxRXMonitor { get; set; }
-
-        public ListBox ListBoxTXMonitor { get; set; }
+        public ComboBox ComboBoxForCOMPorts { get; set; }
 
         public ListBox ListBoxSystemLog { get; set; }
 
@@ -119,6 +117,10 @@ namespace PLCHESerialDebugger
             Controls.Add(lblStatusWord2);
             Controls.Add(CreateStatusPanel("Status Word 2", 0.51f, 0.78f, 0.48f, 0.035f)); // Reduced height for compactness
 
+            // === COM Port Selections ===
+            ComboBoxForCOMPorts = CreateComboBox(0.65f, 0.85f, 0.05f, 0.1f);
+            Controls.Add(ComboBoxForCOMPorts);
+
             // === Polling Checkbox ===
             var lblPollingEnabled = CreateLabel("Polling Active", 0.01f, 0.82f);
             Controls.Add(lblPollingEnabled);
@@ -150,7 +152,33 @@ namespace PLCHESerialDebugger
             UIUpdateTimer.Tick += UIUpdateTimer_Tick; // Add event handler for the Tick event
         }
 
+        private ComboBox CreateComboBox(float xRatio, float yRatio, float widthRatio, float heightRatio)
+        {
+            var comboBox = new ComboBox
+            {
+                Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
+                Size = new Size((int)(this.ClientSize.Width * widthRatio), (int)(this.ClientSize.Height * heightRatio)),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                BackColor = Color.WhiteSmoke
+            };
 
+            return comboBox;
+        }
+
+        private void PopulateComboBox(ComboBox comboBox, IEnumerable<string> items)
+        {
+            comboBox.Items.Clear(); // Clear any existing items
+            foreach (var item in items)
+            {
+                comboBox.Items.Add(item);
+            }
+
+            // Set default selected index if items exist
+            if (comboBox.Items.Count > 0)
+            {
+                comboBox.SelectedIndex = 0;
+            }
+        }
 
 
         private ListBox CreateListBox(float xRatio, float yRatio, float widthRatio, float heightRatio)
