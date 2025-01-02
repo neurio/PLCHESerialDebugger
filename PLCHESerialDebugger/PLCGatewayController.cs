@@ -138,13 +138,31 @@ namespace PLCHESerialDebugger
         public void SendPLCGatewayPacket(string textData) // for Serial PLCHE
         {
             //LogController.AddLogMessage(new LogMessage(text: $"Writing {textData}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
-            PLCGateway.WriteRawString(textData);
+
+            try
+            {
+                PLCGateway.WriteRawString(textData);
+            }
+            catch(Exception ex)
+            {
+                LogController.AddLogMessage(new LogMessage(text: $"{ex.ToString()}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            }
         }
 
         public async Task<string> RetrievePLCGatewayPacket()
         {
-            string returnValue = await PLCGateway.ReadRawString();
-            LogController.AddLogMessage(new LogMessage(text: $" {returnValue}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            string returnValue = "plc packet retrieval error";
+
+            try
+            {
+                returnValue = await PLCGateway.ReadRawString();
+                LogController.AddLogMessage(new LogMessage(text: $" {returnValue}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            }
+            catch (Exception ex)
+            {
+                LogController.AddLogMessage(new LogMessage(text: $"{ex.ToString()}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            }
+            
             return returnValue;
         }
 

@@ -35,7 +35,7 @@ namespace PLCHESerialDebugger
             PLCGatewayController = new PLCGatewayController(LogController);
             AttachDataSources();
             AttachCustomEventHandlers();
-            //LockSerialControls();
+            LockSerialControls();
         }
 
         public void AttachCustomEventHandlers()
