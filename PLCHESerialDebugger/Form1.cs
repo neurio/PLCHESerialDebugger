@@ -42,8 +42,7 @@ namespace PLCHESerialDebugger
         {
             LogController.SerialDataBindingLog.ListChanged += SerialDataBindingLog_ListChanged;
             LogController.SystemBaseDataBindingLog.ListChanged += SystemBaseDataBindingLog_ListChanged;
-
-            ListBoxSystemLog.DataSource = bindingSourceSystemBaseData;
+            LogController.TelemetryDataBindingLog.ListChanged += TelemetryDataBindingLog_ListChanged;
         }
 
         public void SerialDataBindingLog_ListChanged(object sender, ListChangedEventArgs e)
@@ -56,8 +55,19 @@ namespace PLCHESerialDebugger
             // run naunced GUI update logic here
         }
 
+        public void TelemetryDataBindingLog_ListChanged(object sender, ListChangedEventArgs e)
+        {
+            // run naunced GUI update logic here
+        }
+
         public void AttachDataSources()
         {
+            // Bind WinForm control to BindingList
+            ListBoxSystemLog.DataSource = bindingSourceSystemBaseData;
+            ListBoxTelemetryMonitor.DataSource = bindingSourceTelemetryData;
+
+            // Relate BindingList to 'normal' datatypes
+            bindingSourceTelemetryData.DataSource = LogController.TelemetryDataBindingLog;
             bindingSourceRXData.DataSource = LogController.SerialDataBindingLog;
             bindingSourceSystemBaseData.DataSource = LogController.SystemBaseDataBindingLog;
         }
@@ -443,6 +453,11 @@ namespace PLCHESerialDebugger
         }
 
         private void bindingSourceSystemBaseData_CurrentChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void bindingSourceTelemetryData_CurrentChanged(object sender, EventArgs e)
         {
 
         }

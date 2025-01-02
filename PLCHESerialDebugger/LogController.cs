@@ -23,6 +23,8 @@ namespace PLCHESerialDebugger
 
         public BindingList<string> SystemBaseDataBindingLog { get; set; } = new BindingList<string>();
 
+        public BindingList<string> TelemetryDataBindingLog { get; set;} = new BindingList<string>();
+
         public static int LastSyncedSerialDataIndex { get; set; } = 0;
 
         public static int LastSyncedSystemBaseDataIndex { get; set; } = 0;
