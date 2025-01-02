@@ -29,13 +29,13 @@ namespace PLCHESerialDebugger
         public PLCHESerialMonitorForm()
         {
             InitializeComponent(); // Ensures the designer-generated code runs
-            ResizeFormTo80Percent(0.8f);
+            ResizeFormWindow(0.8f, 0.8f); // if these values change, it impacts where all controls get placed; leave alone for now.
             CreateDynamicControls(); // Add our dynamic controls
             LogController = new LogController();
             PLCGatewayController = new PLCGatewayController(LogController);
             AttachDataSources();
             AttachCustomEventHandlers();
-            LockSerialControls();
+            //LockSerialControls();
         }
 
         public void AttachCustomEventHandlers()
@@ -62,13 +62,13 @@ namespace PLCHESerialDebugger
             bindingSourceSystemBaseData.DataSource = LogController.SystemBaseDataBindingLog;
         }
 
-        public void ResizeFormTo80Percent(float scalingRatio)
+        public void ResizeFormWindow(float xScalingRatio, float yScalingRatio)
         {
             var screenWidth = Screen.PrimaryScreen.WorkingArea.Width;
             var screenHeight = Screen.PrimaryScreen.WorkingArea.Height;
 
-            int formWidth = (int)(screenWidth * scalingRatio);
-            int formHeight = (int)(screenHeight * scalingRatio);
+            int formWidth = (int)(screenWidth * xScalingRatio);
+            int formHeight = (int)(screenHeight * yScalingRatio);
 
             this.Size = new Size(formWidth, formHeight);
 
@@ -78,72 +78,115 @@ namespace PLCHESerialDebugger
         private void CreateDynamicControls()
         {
             // === System Transaction Window ===
-            var lblSystemLog = CreateLabel("System Log", 0.01f, 0.01f);
+            var lblSystemLog = CreateLabel("System Log", 0.01f, 0.015f);
+            lblSystemLog.Font = new Font("Calibri Light", 16, FontStyle.Bold);
+            lblSystemLog.BackColor = Color.Transparent;
+            lblSystemLog.BorderStyle = BorderStyle.Fixed3D;
+            lblSystemLog.Padding = new Padding(2);
             Controls.Add(lblSystemLog);
 
             ListBoxSystemLog = CreateListBox(0.01f, 0.05f, 0.98f, 0.35f); // Occupy full width at the top
+            ListBoxSystemLog.Font = new Font("Calibri Light", 10);
             Controls.Add(ListBoxSystemLog);
 
             // === Telemetry Data Window ===
             var lblTelemetry = CreateLabel("Telemetry Data", 0.01f, 0.40f);
+            lblTelemetry.Font = new Font("Calibri Light", 16, FontStyle.Bold);
+            lblTelemetry.BackColor = Color.Transparent;
+            lblTelemetry.BorderStyle = BorderStyle.Fixed3D;
+            lblTelemetry.Padding = new Padding(2);
             Controls.Add(lblTelemetry);
 
             ListBoxTelemetryMonitor = CreateListBox(0.01f, 0.44f, 0.98f, 0.1f); // Full width
             Controls.Add(ListBoxTelemetryMonitor);
 
+            // === Serial Port Configurations ===
+            var lblSerialPortConfiguration = CreateLabel("Serial Port Config.", 0.01f, 0.64f);
+            lblSerialPortConfiguration.Font = new Font("Calibri Light", 16, FontStyle.Bold);
+            lblSerialPortConfiguration.BackColor = Color.Transparent;
+            lblSerialPortConfiguration.BorderStyle = BorderStyle.Fixed3D;
+            lblSerialPortConfiguration.Padding = new Padding(2);
+            Controls.Add(lblSerialPortConfiguration);
+
             // === Command TextBox ===
-            var lblCmdString = CreateLabel("Command String", 0.01f, 0.56f);
+            var lblCmdString = CreateLabel("Command String", 0.01f, 0.69f);
+            lblCmdString.Font = new Font("Calibri Light", 14, FontStyle.Bold);
+            lblCmdString.BackColor = Color.Transparent;
+            lblCmdString.BorderStyle = BorderStyle.Fixed3D;
+            lblCmdString.Padding = new Padding(2);
             Controls.Add(lblCmdString);
-            txtCmdString = CreateTextBox(0.01f, 0.60f, 0.48f, 0.03f); // Reduced width
+
+            txtCmdString = CreateTextBox(0.01f, 0.72f, 0.15f, 0.03f); // Reduced width
+            txtCmdString.Font = new Font("Calibri Light", 12);
             Controls.Add(txtCmdString);
 
             // === Argument TextBox ===
-            var lblCmdArgument = CreateLabel("Argument String", 0.51f, 0.56f);
+            var lblCmdArgument = CreateLabel("Argument String", 0.16f, 0.69f);
+            lblCmdArgument.Font = new Font("Calibri Light", 14, FontStyle.Bold);
+            lblCmdArgument.BackColor = Color.Transparent;
+            lblCmdArgument.BorderStyle = BorderStyle.Fixed3D;
+            lblCmdArgument.Padding = new Padding(2);
             Controls.Add(lblCmdArgument);
-            txtCmdArgument = CreateTextBox(0.51f, 0.60f, 0.48f, 0.03f); // Reduced width
+
+            txtCmdArgument = CreateTextBox(0.16f, 0.72f, 0.15f, 0.03f); // Reduced width
+            txtCmdArgument.Font = new Font("Calibri Light", 12);
             Controls.Add(txtCmdArgument);
 
             // === Send Button ===
-            btnSendCmd = CreateButton("Send", 0.91f, 0.7f / this.ClientSize.Height, 0.08f, 0.03f);
+            btnSendCmd = CreateButton("Send", 0.31f, 0.718f, 0.04f, 0.03f);
+            btnSendCmd.Font = new Font("Calibri Light", 12);
             btnSendCmd.Click += BtnSendCmd_Click;
             Controls.Add(btnSendCmd);
 
             // === Status Panels ===
-            var lblStatusWord1 = CreateLabel("Status Word 1", 0.01f, 0.74f);
+            var lblStatusWord1 = CreateLabel("Status Word 1", 0.01f, 0.56f);
+            lblStatusWord1.Font = new Font("Calibri Light", 16, FontStyle.Bold);
+            lblStatusWord1.BackColor = Color.Transparent;
+            lblStatusWord1.BorderStyle = BorderStyle.Fixed3D;
+            lblStatusWord1.Padding = new Padding(2);
             Controls.Add(lblStatusWord1);
-            Controls.Add(CreateStatusPanel("Status Word 1", 0.01f, 0.78f, 0.48f, 0.035f)); // Reduced height for compactness
+            Controls.Add(CreateStatusPanel("Status Word 1", 0.01f, 0.60f, 0.48f, 0.035f)); // Reduced height for compactness
 
-            var lblStatusWord2 = CreateLabel("Status Word 2", 0.51f, 0.74f);
+            var lblStatusWord2 = CreateLabel("Status Word 2", 0.51f, 0.56f);
+            lblStatusWord2.Font = new Font("Calibri Light", 16, FontStyle.Bold);
+            lblStatusWord2.BackColor = Color.Transparent;
+            lblStatusWord2.BorderStyle = BorderStyle.Fixed3D;
+            lblStatusWord2.Padding = new Padding(2);
             Controls.Add(lblStatusWord2);
-            Controls.Add(CreateStatusPanel("Status Word 2", 0.51f, 0.78f, 0.48f, 0.035f)); // Reduced height for compactness
+            Controls.Add(CreateStatusPanel("Status Word 2", 0.51f, 0.60f, 0.48f, 0.035f)); // Reduced height for compactness
 
             // === COM Port Selections ===
-            ComboBoxForCOMPorts = CreateComboBox(0.65f, 0.85f, 0.05f, 0.1f);
+            var lblCOMPorts = CreateLabel("COM Port #", 0.25f, 0.64f);
+            lblCOMPorts.Font = new Font("Calibri Light", 14, FontStyle.Bold);
+            lblCOMPorts.BackColor = Color.Transparent;
+            lblCOMPorts.BorderStyle = BorderStyle.Fixed3D;
+            lblCOMPorts.Padding = new Padding(2);
+            Controls.Add(lblCOMPorts);
+
+            ComboBoxForCOMPorts = CreateComboBox(0.25f, 0.67f, 0.05f, 0.1f);
             Controls.Add(ComboBoxForCOMPorts);
 
             // === Polling Checkbox ===
-            var lblPollingEnabled = CreateLabel("Polling Active", 0.01f, 0.82f);
-            Controls.Add(lblPollingEnabled);
-            chkPollingEnabled = CreateCheckBox("Enable Polling", 0.01f, 0.86f, 0.2f, 0.04f); // Adjusted position
+            chkPollingEnabled = CreateCheckBox("Enable Polling", 0.11f, 0.63f, 0.1f, 0.04f); // Adjusted position
+            chkPollingEnabled.Font = new Font("Calibri Light", 12, FontStyle.Bold);
             chkPollingEnabled.CheckedChanged += ChkPollingEnabled_CheckedChanged;
             Controls.Add(chkPollingEnabled);
 
             // === Init Serial Port Button ===
-            var lblInitSerial = CreateLabel("Initialize Serial Port", 0.21f, 0.82f);
-            Controls.Add(lblInitSerial);
-            var btnInitSerial = CreateButton("Init Serial", 0.21f, 0.86f, 0.1f, 0.04f);
+            var btnInitSerial = CreateButton("Initialize Serial", 0.01f, 0.75f, 0.1f, 0.04f);
             btnInitSerial.Click += BtnInitSerial_Click;
+            btnInitSerial.Font = new Font("Calibri Light", 14);
             Controls.Add(btnInitSerial);
 
             // === Dispose Serial Port Button ===
-            var lblDisposeSerial = CreateLabel("Dispose Serial Port", 0.34f, 0.82f);
-            Controls.Add(lblDisposeSerial);
-            var btnDisposeSerial = CreateButton("Dispose Serial", 0.34f, 0.86f, 0.1f, 0.04f);
+            var btnDisposeSerial = CreateButton("Dispose Serial", 0.11f, 0.75f, 0.1f, 0.04f);
             btnDisposeSerial.Click += BtnDisposeSerial_Click;
+            btnDisposeSerial.Font = new Font("Calibri Light", 14);
             Controls.Add(btnDisposeSerial);
 
             // === Enable Serial Checkbox ===
-            chkTogglePLCGatewayType = CreateCheckBox("Serial Comm.", 0.47f, 0.86f, 0.2f, 0.04f); // Placed closer to other controls
+            chkTogglePLCGatewayType = CreateCheckBox("Serial Comm.", 0.11f, 0.66f, 0.2f, 0.04f); // Placed closer to other controls
+            chkTogglePLCGatewayType.Font = new Font("Calibri Light", 12, FontStyle.Bold);
             chkTogglePLCGatewayType.CheckedChanged += ChkTogglePLCGatewayType_CheckedChanged;
             Controls.Add(chkTogglePLCGatewayType);
 
