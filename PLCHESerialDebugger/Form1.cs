@@ -45,7 +45,9 @@ namespace PLCHESerialDebugger
         {
             LogController.SerialDataBindingLog.ListChanged += SerialDataBindingLog_ListChanged;
             LogController.SystemBaseDataBindingLog.ListChanged += SystemBaseDataBindingLog_ListChanged;
-            LogController.TelemetryDataBindingLog.ListChanged += TelemetryDataBindingLog_ListChanged;
+
+            PLCGatewayController.COMPortsBindingList.ListChanged += COMPortsBindingList_ListChanged;
+            PLCGatewayController.TelemetryDataBindingLog.ListChanged += TelemetryDataBindingLog_ListChanged;
         }
 
         public void SerialDataBindingLog_ListChanged(object sender, ListChangedEventArgs e)
@@ -64,6 +66,11 @@ namespace PLCHESerialDebugger
             // run naunced GUI update logic here
         }
 
+        public void COMPortsBindingList_ListChanged(object sender, ListChangedEventArgs e)
+        {
+            // run naunced GUI update logic here
+        }
+
         public void AttachDataSources()
         {
             // Bind WinForm control to BindingList
@@ -72,22 +79,20 @@ namespace PLCHESerialDebugger
             ComboBoxForCOMPorts.DataSource = bindingSourceCOMPorts;
 
             // Relate BindingList to 'normal' datatypes
-            bindingSourceTelemetryData.DataSource = LogController.TelemetryDataBindingLog;
             bindingSourceRXData.DataSource = LogController.SerialDataBindingLog;
             bindingSourceSystemBaseData.DataSource = LogController.SystemBaseDataBindingLog;
             bindingSourceCOMPorts.DataSource = PLCGatewayController.COMPortsBindingList;
+            bindingSourceTelemetryData.DataSource = PLCGatewayController.TelemetryDataBindingLog;
         }
 
         public void ResizeFormWindow(float xScalingRatio, float yScalingRatio)
         {
             var screenWidth = Screen.PrimaryScreen.WorkingArea.Width;
             var screenHeight = Screen.PrimaryScreen.WorkingArea.Height;
-
             int formWidth = (int)(screenWidth * xScalingRatio);
             int formHeight = (int)(screenHeight * yScalingRatio);
 
             this.Size = new Size(formWidth, formHeight);
-
             this.StartPosition = FormStartPosition.CenterScreen;
         }
 
@@ -436,7 +441,7 @@ namespace PLCHESerialDebugger
 
             try
             {
-                LogController.AddLogMessage(new LogMessage(text: $"Writing {textData}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow, useTimeStamp: true));
+                LogController.AddLogMessage(new LogMessage(text: $"Writing '{textData}'", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow, useTimeStamp: true));
                 PLCGatewayController.SendPLCGatewayPacket(textData);
                 Thread.Sleep(100);
 

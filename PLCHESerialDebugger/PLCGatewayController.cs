@@ -47,12 +47,15 @@ namespace PLCHESerialDebugger
 
         public BindingList<string> COMPortsBindingList { get; set; } = new BindingList<string>();
 
-        public List<string> ScanSerialPorts()
+        public void ScanSerialPorts()
         {
-            string[] portNames = { };
-            portNames = SerialPort.GetPortNames();
+            List<string> portNames = SerialPort.GetPortNames().ToList();
 
-            return portNames.ToList();
+            foreach (string portName in portNames)
+            {
+                COMPortsBindingList.Add(portName);
+                LogController.AddLogMessage(new LogMessage(text: $"{portName} detected!", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            }
         }
 
         public void EnablePersistentPolling()
