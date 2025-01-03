@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.IO.Ports;
+using PLCHESerialDebugger.Utilities;
 
 namespace PLCHESerialDebugger
 {
@@ -24,6 +25,8 @@ namespace PLCHESerialDebugger
         public Button btnSendCmd { get; set; }
 
         public Button btnScanSerialPorts { get; set; }
+
+        public Button btnOpenPLCGatewayConfigurationForm { get; set; }
 
         public System.Windows.Forms.Timer UIUpdateTimer { get; set; } = new System.Windows.Forms.Timer();
 
@@ -103,32 +106,32 @@ namespace PLCHESerialDebugger
         private void CreateDynamicControls()
         {
             // === System Transaction Window ===
-            var lblSystemLog = CreateLabel("System Log", 0.01f, 0.015f);
+            var lblSystemLog = FormUtilities.CreateLabel("System Log", 0.01f, 0.015f, this);
             lblSystemLog.Font = new Font("Calibri Light", 16, FontStyle.Bold);
             lblSystemLog.BackColor = Color.Transparent;
             lblSystemLog.BorderStyle = BorderStyle.Fixed3D;
             lblSystemLog.Padding = new Padding(2);
             Controls.Add(lblSystemLog);
 
-            ListBoxSystemLog = CreateListBox(0.01f, 0.05f, 0.98f, 0.35f); // Occupy full width at the top
+            ListBoxSystemLog = FormUtilities.CreateListBox(0.01f, 0.05f, 0.98f, 0.35f, this); // Occupy full width at the top
             ListBoxSystemLog.Font = new Font("Calibri Light", 10);
             ListBoxSystemLog.HorizontalScrollbar = true;
             ListBoxSystemLog.ScrollAlwaysVisible = true;
             Controls.Add(ListBoxSystemLog);
 
             // === Telemetry Data Window ===
-            var lblTelemetry = CreateLabel("Telemetry Data", 0.01f, 0.40f);
+            var lblTelemetry = FormUtilities.CreateLabel("Telemetry Data", 0.01f, 0.40f, this);
             lblTelemetry.Font = new Font("Calibri Light", 16, FontStyle.Bold);
             lblTelemetry.BackColor = Color.Transparent;
             lblTelemetry.BorderStyle = BorderStyle.Fixed3D;
             lblTelemetry.Padding = new Padding(2);
             Controls.Add(lblTelemetry);
 
-            ListBoxTelemetryMonitor = CreateListBox(0.01f, 0.44f, 0.98f, 0.1f); // Full width
+            ListBoxTelemetryMonitor = FormUtilities.CreateListBox(0.01f, 0.44f, 0.98f, 0.1f, this); // Full width
             Controls.Add(ListBoxTelemetryMonitor);
 
             // === Serial Port Configurations ===
-            var lblSerialPortConfiguration = CreateLabel("Serial Port Config.", 0.01f, 0.64f);
+            var lblSerialPortConfiguration = FormUtilities.CreateLabel("Serial Port Config.", 0.01f, 0.64f, this);
             lblSerialPortConfiguration.Font = new Font("Calibri Light", 16, FontStyle.Bold);
             lblSerialPortConfiguration.BackColor = Color.Transparent;
             lblSerialPortConfiguration.BorderStyle = BorderStyle.Fixed3D;
@@ -136,103 +139,109 @@ namespace PLCHESerialDebugger
             Controls.Add(lblSerialPortConfiguration);
 
             // === Command TextBox ===
-            var lblCmdString = CreateLabel("Command String", 0.01f, 0.69f);
+            var lblCmdString = FormUtilities.CreateLabel("Command String", 0.01f, 0.69f, this);
             lblCmdString.Font = new Font("Calibri Light", 14, FontStyle.Bold);
             lblCmdString.BackColor = Color.Transparent;
             lblCmdString.BorderStyle = BorderStyle.Fixed3D;
             lblCmdString.Padding = new Padding(2);
             Controls.Add(lblCmdString);
 
-            txtCmdString = CreateTextBox(0.01f, 0.72f, 0.15f, 0.03f); // Reduced width
+            txtCmdString = FormUtilities.CreateTextBox(0.01f, 0.72f, 0.15f, 0.03f, this); // Reduced width
             txtCmdString.Font = new Font("Calibri Light", 12);
             Controls.Add(txtCmdString);
 
             // === Argument TextBox ===
-            var lblCmdArgument = CreateLabel("Argument String", 0.16f, 0.69f);
+            var lblCmdArgument = FormUtilities.CreateLabel("Argument String", 0.16f, 0.69f, this);
             lblCmdArgument.Font = new Font("Calibri Light", 14, FontStyle.Bold);
             lblCmdArgument.BackColor = Color.Transparent;
             lblCmdArgument.BorderStyle = BorderStyle.Fixed3D;
             lblCmdArgument.Padding = new Padding(2);
             Controls.Add(lblCmdArgument);
 
-            txtCmdArgument = CreateTextBox(0.16f, 0.72f, 0.15f, 0.03f); // Reduced width
+            txtCmdArgument = FormUtilities.CreateTextBox(0.16f, 0.72f, 0.15f, 0.03f, this); // Reduced width
             txtCmdArgument.Font = new Font("Calibri Light", 12);
             Controls.Add(txtCmdArgument);
 
             // === Send Button ===
-            btnSendCmd = CreateButton("Send", 0.31f, 0.718f, 0.04f, 0.03f);
+            btnSendCmd = FormUtilities.CreateButton("Send", 0.31f, 0.718f, 0.04f, 0.03f, this);
             btnSendCmd.Font = new Font("Calibri Light", 12);
             btnSendCmd.Click += BtnSendCmd_Click;
             Controls.Add(btnSendCmd);
 
             // === Scan Serial Button ===
 
-            btnScanSerialPorts = CreateButton("Scan Serial Ports", 0.25f, 0.695f, 0.07f, 0.025f);
+            btnScanSerialPorts = FormUtilities.CreateButton("Scan Serial Ports", 0.25f, 0.695f, 0.07f, 0.025f, this);
             btnScanSerialPorts.Font = new Font("Calibri Light", 12);
             btnScanSerialPorts.Click += BtnScanSerialPorts_Click;
             Controls.Add(btnScanSerialPorts);
 
             // === Status Panels ===
-            var lblStatusWord1 = CreateLabel("Status Word 1", 0.01f, 0.56f);
+            var lblStatusWord1 = FormUtilities.CreateLabel("Status Word 1", 0.01f, 0.56f, this);
             lblStatusWord1.Font = new Font("Calibri Light", 16, FontStyle.Bold);
             lblStatusWord1.BackColor = Color.Transparent;
             lblStatusWord1.BorderStyle = BorderStyle.Fixed3D;
             lblStatusWord1.Padding = new Padding(2);
             Controls.Add(lblStatusWord1);
-            Controls.Add(CreateStatusPanel("Status Word 1", 0.01f, 0.60f, 0.48f, 0.035f)); // Reduced height for compactness
+            Controls.Add(FormUtilities.CreateStatusPanel("Status Word 1", 0.01f, 0.60f, 0.48f, 0.035f, this)); // Reduced height for compactness
 
-            var lblStatusWord2 = CreateLabel("Status Word 2", 0.51f, 0.56f);
+            var lblStatusWord2 = FormUtilities.CreateLabel("Status Word 2", 0.51f, 0.56f, this);
             lblStatusWord2.Font = new Font("Calibri Light", 16, FontStyle.Bold);
             lblStatusWord2.BackColor = Color.Transparent;
             lblStatusWord2.BorderStyle = BorderStyle.Fixed3D;
             lblStatusWord2.Padding = new Padding(2);
             Controls.Add(lblStatusWord2);
-            Controls.Add(CreateStatusPanel("Status Word 2", 0.51f, 0.60f, 0.48f, 0.035f)); // Reduced height for compactness
+            Controls.Add(FormUtilities.CreateStatusPanel("Status Word 2", 0.51f, 0.60f, 0.48f, 0.035f, this)); // Reduced height for compactness
 
             // === COM Port Selections ===
-            var lblCOMPorts = CreateLabel("COM Port #", 0.25f, 0.64f);
+            var lblCOMPorts = FormUtilities.CreateLabel("COM Port #", 0.25f, 0.64f, this);
             lblCOMPorts.Font = new Font("Calibri Light", 14, FontStyle.Bold);
             lblCOMPorts.BackColor = Color.Transparent;
             lblCOMPorts.BorderStyle = BorderStyle.Fixed3D;
             lblCOMPorts.Padding = new Padding(2);
             Controls.Add(lblCOMPorts);
 
-            ComboBoxForCOMPorts = CreateComboBox(0.25f, 0.67f, 0.05f, 0.1f);
+            ComboBoxForCOMPorts = FormUtilities.CreateComboBox(0.25f, 0.67f, 0.05f, 0.1f, this);
             Controls.Add(ComboBoxForCOMPorts);
 
             // === Baud Rate ComboBox ===
-            var lblBaudRates = CreateLabel("Baud Rate", 0.31f, 0.64f);
+            var lblBaudRates = FormUtilities.CreateLabel("Baud Rate", 0.31f, 0.64f, this);
             lblBaudRates.Font = new Font("Calibri Light", 14, FontStyle.Bold);
             lblBaudRates.BackColor = Color.Transparent;
             lblBaudRates.BorderStyle = BorderStyle.Fixed3D;
             lblBaudRates.Padding = new Padding(2);
             Controls.Add(lblBaudRates);
 
-            ComboBoxForBaudRates = CreateComboBox(0.31f, 0.67f, 0.05f, 0.1f);
+            ComboBoxForBaudRates = FormUtilities.CreateComboBox(0.31f, 0.67f, 0.05f, 0.1f, this);
             Controls.Add(ComboBoxForBaudRates);
 
-            PopulateComboBox(ComboBoxForBaudRates, SupportedBaudRates);
+            FormUtilities.PopulateComboBox(ComboBoxForBaudRates, SupportedBaudRates);
 
             // === Polling Checkbox ===
-            chkPollingEnabled = CreateCheckBox("Enable Polling", 0.11f, 0.63f, 0.1f, 0.04f); // Adjusted position
+            chkPollingEnabled = FormUtilities.CreateCheckBox("Enable Polling", 0.11f, 0.63f, 0.1f, 0.04f, this); // Adjusted position
             chkPollingEnabled.Font = new Font("Calibri Light", 12, FontStyle.Bold);
             chkPollingEnabled.CheckedChanged += ChkPollingEnabled_CheckedChanged;
             Controls.Add(chkPollingEnabled);
 
             // === Init Serial Port Button ===
-            var btnInitSerial = CreateButton("Initialize Serial", 0.01f, 0.75f, 0.1f, 0.04f);
+            var btnInitSerial = FormUtilities.CreateButton("Initialize Serial", 0.01f, 0.75f, 0.1f, 0.04f, this);
             btnInitSerial.Click += BtnInitSerial_Click;
             btnInitSerial.Font = new Font("Calibri Light", 14);
             Controls.Add(btnInitSerial);
 
             // === Dispose Serial Port Button ===
-            var btnDisposeSerial = CreateButton("Dispose Serial", 0.11f, 0.75f, 0.1f, 0.04f);
+            var btnDisposeSerial = FormUtilities.CreateButton("Dispose Serial", 0.11f, 0.75f, 0.1f, 0.04f, this);
             btnDisposeSerial.Click += BtnDisposeSerial_Click;
             btnDisposeSerial.Font = new Font("Calibri Light", 14);
             Controls.Add(btnDisposeSerial);
 
+            // === Open PLC Gateway Form Button ===
+            btnOpenPLCGatewayConfigurationForm = FormUtilities.CreateButton("PLC Configuration", 0.21f, 0.75f, 0.1f, 0.04f, this);
+            btnOpenPLCGatewayConfigurationForm.Click += BtnPLCConfiguration_Click;
+            btnOpenPLCGatewayConfigurationForm.Font = new Font("Calibri Light", 14);
+            Controls.Add(btnOpenPLCGatewayConfigurationForm);
+
             // === Enable Serial Checkbox ===
-            chkTogglePLCGatewayType = CreateCheckBox("Serial Comm.", 0.11f, 0.66f, 0.2f, 0.04f); // Placed closer to other controls
+            chkTogglePLCGatewayType = FormUtilities.CreateCheckBox("Serial Comm.", 0.11f, 0.66f, 0.2f, 0.04f, this); // Placed closer to other controls
             chkTogglePLCGatewayType.Font = new Font("Calibri Light", 12, FontStyle.Bold);
             chkTogglePLCGatewayType.CheckedChanged += ChkTogglePLCGatewayType_CheckedChanged;
             Controls.Add(chkTogglePLCGatewayType);
@@ -240,125 +249,6 @@ namespace PLCHESerialDebugger
             // UI Update Timer
             UIUpdateTimer.Interval = 100; // Set interval to 100ms
             UIUpdateTimer.Tick += UIUpdateTimer_Tick; // Add event handler for the Tick event
-        }
-
-        private ComboBox CreateComboBox(float xRatio, float yRatio, float widthRatio, float heightRatio)
-        {
-            var comboBox = new ComboBox
-            {
-                Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
-                Size = new Size((int)(this.ClientSize.Width * widthRatio), (int)(this.ClientSize.Height * heightRatio)),
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                BackColor = Color.WhiteSmoke
-            };
-
-            return comboBox;
-        }
-
-        private void PopulateComboBox(ComboBox comboBox, IEnumerable<string> items)
-        {
-            comboBox.Items.Clear(); // Clear any existing items
-            foreach (var item in items)
-            {
-                comboBox.Items.Add(item);
-            }
-
-            // Set default selected index if items exist
-            if (comboBox.Items.Count > 0)
-            {
-                comboBox.SelectedIndex = 0;
-            }
-        }
-
-
-        private ListBox CreateListBox(float xRatio, float yRatio, float widthRatio, float heightRatio)
-        {
-            var listBox = new ListBox
-            {
-                Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
-                Size = new Size((int)(this.ClientSize.Width * widthRatio), (int)(this.ClientSize.Height * heightRatio)),
-                BorderStyle = BorderStyle.FixedSingle,
-                BackColor = Color.WhiteSmoke
-            };
-
-            // Enable scrolling if items exceed visible area
-            listBox.HorizontalScrollbar = true;
-
-            return listBox;
-        }
-
-
-        private TextBox CreateTextBox(float xRatio, float yRatio, float widthRatio, float heightRatio)
-        {
-            var textBox = new TextBox
-            {
-                Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
-                Size = new Size((int)(this.ClientSize.Width * widthRatio), (int)(this.ClientSize.Height * heightRatio)),
-                Multiline = false,  // Ensure it's single-line and prevent scrollbars
-                ScrollBars = ScrollBars.None,  // Disable scrollbars
-            };
-
-            return textBox;
-        }
-
-
-        private Button CreateButton(string text, float xRatio, float yRatio, float widthRatio, float heightRatio)
-        {
-            var button = new Button
-            {
-                Text = text,
-                Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
-                Size = new Size((int)(this.ClientSize.Width * widthRatio), (int)(this.ClientSize.Height * heightRatio))
-            };
-            return button;
-        }
-
-        private CheckBox CreateCheckBox(string text, float xRatio, float yRatio, float widthRatio, float heightRatio)
-        {
-            var chkBox = new CheckBox
-            {
-                Text = text,
-                Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
-                Size = new Size((int)(this.ClientSize.Width * widthRatio), (int)(this.ClientSize.Height * heightRatio))
-            };
-            return chkBox;
-        }
-
-        private Panel CreateStatusPanel(string label, float xRatio, float yRatio, float widthRatio, float heightRatio)
-        {
-            var panel = new Panel
-            {
-                Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
-                Size = new Size((int)(this.ClientSize.Width * widthRatio), (int)(this.ClientSize.Height * heightRatio)),
-                BorderStyle = BorderStyle.FixedSingle,
-            };
-
-            var lblStatus = new Label
-            {
-                Text = label,
-                Location = new Point(10, 10),
-                Size = new Size(panel.Width - 20, 20)
-            };
-            panel.Controls.Add(lblStatus);
-
-            // Add more controls or placeholders inside this panel
-            // Adjust sizes to match the content
-
-            return panel;
-        }
-
-
-
-
-        private Label CreateLabel(string text, float xRatio, float yRatio)
-        {
-            var lbl = new Label
-            {
-                Text = text,
-                Location = new Point((int)(this.ClientSize.Width * xRatio), (int)(this.ClientSize.Height * yRatio)),
-                AutoSize = true
-            };
-            return lbl;
         }
 
         // Timer Tick event handler
@@ -435,6 +325,17 @@ namespace PLCHESerialDebugger
             {
                 UnlockSerialControls();
             }
+        }
+
+        private void BtnPLCConfiguration_Click(object sender, EventArgs e)
+        {
+            // need to spawn a new form here
+            // cannot block the current thread
+            // should exist adjacent to current screen
+            // both forms should be editable at once
+            // the 2nd form will have to update values in PLCGatewayController so ideally this form will be passed this controller object too
+
+
         }
 
         private void UnlockSerialControls()
