@@ -59,11 +59,7 @@ namespace PLCHESerialDebugger
                         {
                             SerialLog.Add(message);
                             SyncSerialDataBindingLog(); // For GUI
-                            //string timestamp = match.Groups[1].Value;
-                            //string messageText = match.Groups[2].Value;
                         }
-
-
                         break;
                 }
             }

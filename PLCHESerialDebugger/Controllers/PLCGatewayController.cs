@@ -47,6 +47,12 @@ namespace PLCHESerialDebugger
 
         public BindingList<string> COMPortsBindingList { get; set; } = new BindingList<string>();
 
+
+        public void GetIT900Data()
+        {
+            SendPLCGatewayPacket("it900");
+        }
+
         public void ScanSerialPorts()
         {
             List<string> portNames = SerialPort.GetPortNames().ToList();

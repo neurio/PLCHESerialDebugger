@@ -39,7 +39,7 @@ namespace PLCHESerialDebugger
         public PLCHESerialMonitorForm()
         {
             InitializeComponent(); // Ensures the designer-generated code runs
-            ResizeFormWindow(0.8f, 0.8f); // if these values change, it impacts where all controls get placed; leave alone for now.
+            FormUtilities.ResizeFormWindow(0.8f, 0.8f, this); // if these values change, it impacts where all controls get placed; leave alone for now.
             CreateDynamicControls(); // Add our dynamic controls
             LogController = new LogController();
             PLCGatewayController = new PLCGatewayController(LogController);
@@ -90,17 +90,6 @@ namespace PLCHESerialDebugger
             bindingSourceSystemBaseData.DataSource = LogController.SystemBaseDataBindingLog;
             bindingSourceCOMPorts.DataSource = PLCGatewayController.COMPortsBindingList;
             bindingSourceTelemetryData.DataSource = PLCGatewayController.TelemetryDataBindingLog;
-        }
-
-        public void ResizeFormWindow(float xScalingRatio, float yScalingRatio)
-        {
-            var screenWidth = Screen.PrimaryScreen.WorkingArea.Width;
-            var screenHeight = Screen.PrimaryScreen.WorkingArea.Height;
-            int formWidth = (int)(screenWidth * xScalingRatio);
-            int formHeight = (int)(screenHeight * yScalingRatio);
-
-            this.Size = new Size(formWidth, formHeight);
-            this.StartPosition = FormStartPosition.CenterScreen;
         }
 
         private void CreateDynamicControls()
@@ -334,6 +323,12 @@ namespace PLCHESerialDebugger
             // should exist adjacent to current screen
             // both forms should be editable at once
             // the 2nd form will have to update values in PLCGatewayController so ideally this form will be passed this controller object too
+
+            FormPLCGatewayConfiguration formPLCGatewayConfiguration = new FormPLCGatewayConfiguration(PLCGatewayController, LogController);
+            formPLCGatewayConfiguration.Show(); // Open Form2 non-blocking
+
+           // Application.Run(new FormPLCGatewayConfiguration(PLCGatewayController, LogController));
+
 
 
         }

@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
-using System.Windows.Forms;
-
-
-namespace PLCHESerialDebugger.Utilities
+﻿namespace PLCHESerialDebugger.Utilities
 {
     public static class FormUtilities
     {
@@ -67,6 +58,7 @@ namespace PLCHESerialDebugger.Utilities
 
             return textBox;
         }
+        
         public static Button CreateButton(string text, float xRatio, float yRatio, float widthRatio, float heightRatio, Form form)
         {
             var button = new Button
@@ -77,6 +69,7 @@ namespace PLCHESerialDebugger.Utilities
             };
             return button;
         }
+        
         public static CheckBox CreateCheckBox(string text, float xRatio, float yRatio, float widthRatio, float heightRatio, Form form)
         {
             var chkBox = new CheckBox
@@ -87,6 +80,7 @@ namespace PLCHESerialDebugger.Utilities
             };
             return chkBox;
         }
+        
         public static Panel CreateStatusPanel(string label, float xRatio, float yRatio, float widthRatio, float heightRatio, Form form)
         {
             var panel = new Panel
@@ -109,6 +103,7 @@ namespace PLCHESerialDebugger.Utilities
 
             return panel;
         }
+        
         public static Label CreateLabel(string text, float xRatio, float yRatio, Form form)
         {
             var lbl = new Label
@@ -118,6 +113,17 @@ namespace PLCHESerialDebugger.Utilities
                 AutoSize = true
             };
             return lbl;
+        }
+
+        public static void ResizeFormWindow(float xScalingRatio, float yScalingRatio, Form form)
+        {
+            var screenWidth = Screen.PrimaryScreen.WorkingArea.Width;
+            var screenHeight = Screen.PrimaryScreen.WorkingArea.Height;
+            int formWidth = (int)(screenWidth * xScalingRatio);
+            int formHeight = (int)(screenHeight * yScalingRatio);
+
+            form.Size = new Size(formWidth, formHeight);
+            form.StartPosition = FormStartPosition.CenterScreen;
         }
     }
 }
