@@ -415,15 +415,22 @@ namespace PLCHESerialDebugger
 
         private void BtnInitSerial_Click(object sender, EventArgs e)
         {
-            int selectedPortNumberIndex = ComboBoxForCOMPorts.SelectedIndex;
-            string selectedPort = ComboBoxForCOMPorts.Items[selectedPortNumberIndex].ToString();
-            string portNumber = selectedPort.Substring(3);
-            int.TryParse(portNumber, out int selectedPortNumberInt);
+            try
+            {
+                int selectedPortNumberIndex = ComboBoxForCOMPorts.SelectedIndex;
+                string selectedPort = ComboBoxForCOMPorts.Items[selectedPortNumberIndex].ToString();
+                string portNumber = selectedPort.Substring(3);
+                int.TryParse(portNumber, out int selectedPortNumberInt);
 
-            string selectedBaudRate = ComboBoxForBaudRates.Text;
-            int.TryParse(selectedBaudRate, out int selectedBaudRateInt);
+                string selectedBaudRate = ComboBoxForBaudRates.Text;
+                int.TryParse(selectedBaudRate, out int selectedBaudRateInt);
+                PLCGatewayController.InitializePLCGateway(selectedPortNumberInt, selectedBaudRateInt);
+            }
+            catch (Exception ex)
+            {
+                LogController.AddLogMessage(new LogMessage(text: $"{ex.ToString()}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            }
 
-            PLCGatewayController.InitializePLCGateway(selectedPortNumberInt, selectedBaudRateInt);
             if (PLCGatewayController.GatewayInit)
             {
                 UnlockSerialControls();
