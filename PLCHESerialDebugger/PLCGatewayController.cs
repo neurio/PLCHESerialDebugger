@@ -136,7 +136,7 @@ namespace PLCHESerialDebugger
                         }
                     case PLCGatewayType.SerialPLCHE:
                         {
-                            PLCGateway = new SerialPLCHE(comPortNumber: SerialPortNumber, baudRate: SerialBaudRate);
+                            PLCGateway = new SerialPLCHE(ComPortNumber: SerialPortNumber, BaudRate: SerialBaudRate);
                             break;
                         }
                 }
