@@ -1,5 +1,7 @@
 ﻿using CP110Library;
 using CP110Library.New;
+using System.ComponentModel;
+using System.IO.Ports;
 using System.Net;
 
 namespace PLCHESerialDebugger
@@ -40,6 +42,18 @@ namespace PLCHESerialDebugger
         public bool PersistentPollingEnabled { get; set; } = false;
 
         public LogController LogController { get; set; }
+
+        public BindingList<string> TelemetryDataBindingLog { get; set; } = new BindingList<string>();
+
+        public BindingList<string> COMPortsBindingList { get; set; } = new BindingList<string>();
+
+        public List<string> ScanSerialPorts()
+        {
+            string[] portNames = { };
+            portNames = SerialPort.GetPortNames();
+
+            return portNames.ToList();
+        }
 
         public void EnablePersistentPolling()
         {

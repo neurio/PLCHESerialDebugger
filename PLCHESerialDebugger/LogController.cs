@@ -88,8 +88,15 @@ namespace PLCHESerialDebugger
             for (int x = LastSyncedSystemBaseDataIndex; x < BaseLog.Count; x++)
             {
                 var logMessage = BaseLog[x];
-                string formattedLog = $"{logMessage.Text}";
-                SystemBaseDataBindingLog.Add(formattedLog);
+                var lines = logMessage.Text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+
+                foreach (var line in lines)
+                {
+                    SystemBaseDataBindingLog.Add(line);
+                }
+
+                // string formattedLog = $"{logMessage.Text}";
+                // SystemBaseDataBindingLog.Add(formattedLog);
             }
 
             LastSyncedSystemBaseDataIndex = BaseLog.Count; // Update the synced index

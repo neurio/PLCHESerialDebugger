@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.IO.Ports;
 
 namespace PLCHESerialDebugger
 {
@@ -19,6 +20,8 @@ namespace PLCHESerialDebugger
         public CheckBox chkPollingEnabled { get; set; }
 
         public Button btnSendCmd { get; set; }
+
+        public Button btnScanSerialPorts { get; set; }
 
         public System.Windows.Forms.Timer UIUpdateTimer { get; set; } = new System.Windows.Forms.Timer();
 
@@ -47,6 +50,7 @@ namespace PLCHESerialDebugger
 
         public void SerialDataBindingLog_ListChanged(object sender, ListChangedEventArgs e)
         {
+
             // run nuanced GUI update logic here
         }
 
@@ -65,11 +69,13 @@ namespace PLCHESerialDebugger
             // Bind WinForm control to BindingList
             ListBoxSystemLog.DataSource = bindingSourceSystemBaseData;
             ListBoxTelemetryMonitor.DataSource = bindingSourceTelemetryData;
+            ComboBoxForCOMPorts.DataSource = bindingSourceCOMPorts;
 
             // Relate BindingList to 'normal' datatypes
             bindingSourceTelemetryData.DataSource = LogController.TelemetryDataBindingLog;
             bindingSourceRXData.DataSource = LogController.SerialDataBindingLog;
             bindingSourceSystemBaseData.DataSource = LogController.SystemBaseDataBindingLog;
+            bindingSourceCOMPorts.DataSource = PLCGatewayController.COMPortsBindingList;
         }
 
         public void ResizeFormWindow(float xScalingRatio, float yScalingRatio)
@@ -97,6 +103,8 @@ namespace PLCHESerialDebugger
 
             ListBoxSystemLog = CreateListBox(0.01f, 0.05f, 0.98f, 0.35f); // Occupy full width at the top
             ListBoxSystemLog.Font = new Font("Calibri Light", 10);
+            ListBoxSystemLog.HorizontalScrollbar = true;
+            ListBoxSystemLog.ScrollAlwaysVisible = true;
             Controls.Add(ListBoxSystemLog);
 
             // === Telemetry Data Window ===
@@ -147,6 +155,13 @@ namespace PLCHESerialDebugger
             btnSendCmd.Font = new Font("Calibri Light", 12);
             btnSendCmd.Click += BtnSendCmd_Click;
             Controls.Add(btnSendCmd);
+
+            // === Scan Serial Button ===
+
+            btnScanSerialPorts = CreateButton("Scan Serial Ports", 0.25f, 0.695f, 0.07f, 0.025f);
+            btnScanSerialPorts.Font = new Font("Calibri Light", 12);
+            btnScanSerialPorts.Click += BtnScanSerialPorts_Click;
+            Controls.Add(btnScanSerialPorts);
 
             // === Status Panels ===
             var lblStatusWord1 = CreateLabel("Status Word 1", 0.01f, 0.56f);
@@ -435,6 +450,21 @@ namespace PLCHESerialDebugger
             }
         }
 
+        private async void BtnScanSerialPorts_Click(object sender, EventArgs e)
+        {
+            string[] portNames = { };
+
+            try
+            {
+                LogController.AddLogMessage(new LogMessage(text: $"Scanning Serial Ports", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow, useTimeStamp: true));
+                PLCGatewayController.ScanSerialPorts();
+            }
+            catch (Exception ex)
+            {
+                LogController.AddLogMessage(new LogMessage(text: $"{ex.ToString()}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            }
+        }
+
         private void AppendToTextbox(TextBox textbox, string message)
         {
             if (textbox.InvokeRequired)
@@ -458,6 +488,11 @@ namespace PLCHESerialDebugger
         }
 
         private void bindingSourceTelemetryData_CurrentChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void bindingSourceCOMPorts_CurrentChanged(object sender, EventArgs e)
         {
 
         }

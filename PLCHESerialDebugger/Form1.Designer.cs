@@ -32,9 +32,11 @@
             bindingSourceRXData = new BindingSource(components);
             bindingSourceSystemBaseData = new BindingSource(components);
             bindingSourceTelemetryData = new BindingSource(components);
+            bindingSourceCOMPorts = new BindingSource(components);
             ((System.ComponentModel.ISupportInitialize)bindingSourceRXData).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bindingSourceSystemBaseData).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bindingSourceTelemetryData).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)bindingSourceCOMPorts).BeginInit();
             SuspendLayout();
             // 
             // bindingSourceRXData
@@ -49,6 +51,10 @@
             // 
             bindingSourceTelemetryData.CurrentChanged += bindingSourceTelemetryData_CurrentChanged;
             // 
+            // bindingSourceCOMPorts
+            // 
+            bindingSourceCOMPorts.CurrentChanged += bindingSourceCOMPorts_CurrentChanged;
+            // 
             // PLCHESerialMonitorForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -59,6 +65,7 @@
             ((System.ComponentModel.ISupportInitialize)bindingSourceRXData).EndInit();
             ((System.ComponentModel.ISupportInitialize)bindingSourceSystemBaseData).EndInit();
             ((System.ComponentModel.ISupportInitialize)bindingSourceTelemetryData).EndInit();
+            ((System.ComponentModel.ISupportInitialize)bindingSourceCOMPorts).EndInit();
             ResumeLayout(false);
         }
 
@@ -67,5 +74,6 @@
         private BindingSource bindingSourceRXData;
         private BindingSource bindingSourceSystemBaseData;
         private BindingSource bindingSourceTelemetryData;
+        private BindingSource bindingSourceCOMPorts;
     }
 }
