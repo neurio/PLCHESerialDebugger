@@ -28,6 +28,8 @@ namespace PLCHESerialDebugger
 
         public Button btnOpenPLCGatewayConfigurationForm { get; set; }
 
+        public Button btnClearSystemLog { get; set; }
+
         public System.Windows.Forms.Timer UIUpdateTimer { get; set; } = new System.Windows.Forms.Timer();
 
         public PLCGatewayController PLCGatewayController { get; set; }
@@ -229,6 +231,12 @@ namespace PLCHESerialDebugger
             btnOpenPLCGatewayConfigurationForm.Font = new Font("Calibri Light", 14);
             Controls.Add(btnOpenPLCGatewayConfigurationForm);
 
+            // === Clear System Log Button ===
+            btnClearSystemLog = FormUtilities.CreateButton("Clear Log", 0.31f, 0.75f, 0.1f, 0.04f, this);
+            btnClearSystemLog.Click += btnClearSystemLog_Click;
+            btnClearSystemLog.Font = new Font("Calibri Light", 14);
+            Controls.Add(btnClearSystemLog);
+
             // === Enable Serial Checkbox ===
             chkTogglePLCGatewayType = FormUtilities.CreateCheckBox("Serial Comm.", 0.11f, 0.66f, 0.2f, 0.04f, this); // Placed closer to other controls
             chkTogglePLCGatewayType.Font = new Font("Calibri Light", 12, FontStyle.Bold);
@@ -326,11 +334,11 @@ namespace PLCHESerialDebugger
 
             FormPLCGatewayConfiguration formPLCGatewayConfiguration = new FormPLCGatewayConfiguration(PLCGatewayController, LogController);
             formPLCGatewayConfiguration.Show(); // Open Form2 non-blocking
+        }
 
-           // Application.Run(new FormPLCGatewayConfiguration(PLCGatewayController, LogController));
-
-
-
+        private void btnClearSystemLog_Click(object sender, EventArgs e)
+        {
+            LogController.SystemBaseDataBindingLog.Clear();
         }
 
         private void UnlockSerialControls()
