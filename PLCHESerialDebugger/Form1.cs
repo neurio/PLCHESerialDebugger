@@ -7,6 +7,8 @@ namespace PLCHESerialDebugger
     {
         public ComboBox ComboBoxForCOMPorts { get; set; }
 
+        public ComboBox ComboBoxForBaudRates { get; set; }
+
         public ListBox ListBoxSystemLog { get; set; }
 
         public ListBox ListBoxTelemetryMonitor { get; set; }
@@ -28,6 +30,8 @@ namespace PLCHESerialDebugger
         public PLCGatewayController PLCGatewayController { get; set; }
 
         public LogController LogController { get; set; }
+
+        public List<string> SupportedBaudRates { get; set; } = new List<string>() { "115200", "57600", "38400", "19200", "9600"};
 
         public PLCHESerialMonitorForm()
         {
@@ -195,6 +199,19 @@ namespace PLCHESerialDebugger
 
             ComboBoxForCOMPorts = CreateComboBox(0.25f, 0.67f, 0.05f, 0.1f);
             Controls.Add(ComboBoxForCOMPorts);
+
+            // === Baud Rate ComboBox ===
+            var lblBaudRates = CreateLabel("Baud Rate", 0.31f, 0.64f);
+            lblBaudRates.Font = new Font("Calibri Light", 14, FontStyle.Bold);
+            lblBaudRates.BackColor = Color.Transparent;
+            lblBaudRates.BorderStyle = BorderStyle.Fixed3D;
+            lblBaudRates.Padding = new Padding(2);
+            Controls.Add(lblBaudRates);
+
+            ComboBoxForBaudRates = CreateComboBox(0.31f, 0.67f, 0.05f, 0.1f);
+            Controls.Add(ComboBoxForBaudRates);
+
+            PopulateComboBox(ComboBoxForBaudRates, SupportedBaudRates);
 
             // === Polling Checkbox ===
             chkPollingEnabled = CreateCheckBox("Enable Polling", 0.11f, 0.63f, 0.1f, 0.04f); // Adjusted position
@@ -398,9 +415,19 @@ namespace PLCHESerialDebugger
 
         private void BtnInitSerial_Click(object sender, EventArgs e)
         {
-            PLCGatewayController.InitializePLCGateway();
-            UnlockSerialControls();
+            int selectedPortNumberIndex = ComboBoxForCOMPorts.SelectedIndex;
+            string selectedPort = ComboBoxForCOMPorts.Items[selectedPortNumberIndex].ToString();
+            string portNumber = selectedPort.Substring(3);
+            int.TryParse(portNumber, out int selectedPortNumberInt);
 
+            string selectedBaudRate = ComboBoxForBaudRates.Text;
+            int.TryParse(selectedBaudRate, out int selectedBaudRateInt);
+
+            PLCGatewayController.InitializePLCGateway(selectedPortNumberInt, selectedBaudRateInt);
+            if (PLCGatewayController.GatewayInit)
+            {
+                UnlockSerialControls();
+            }
         }
 
         private void UnlockSerialControls()

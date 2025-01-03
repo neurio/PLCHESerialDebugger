@@ -118,7 +118,7 @@ namespace PLCHESerialDebugger
             }
         }
 
-        public void InitializePLCGateway()
+        public bool InitializePLCGateway(int? SerialPortNumber, int? SerialBaudRate)
         {
             if (PLCGateway != null)
             {
@@ -136,19 +136,22 @@ namespace PLCHESerialDebugger
                         }
                     case PLCGatewayType.SerialPLCHE:
                         {
-                            PLCGateway = new SerialPLCHE();
+                            PLCGateway = new SerialPLCHE(comPortNumber: SerialPortNumber, baudRate: SerialBaudRate);
                             break;
                         }
                 }
 
                 GatewayInit = true;
                 LogController.AddLogMessage(new LogMessage(text: $"{PLCGateway.GetType()} init. and ready to use.", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+                return true;
             }
             catch (Exception ex)
             {
                 LogController.AddLogMessage(new LogMessage(text: $"{ex.ToString()}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
                 LogController.AddLogMessage(new LogMessage(text: $"PLCGateway not initialized; some issue occurred.", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
             }
+
+            return false;
         }
 
         // not much sense in generalizing this cp110/serialplche single packet transmission, as required commands will be called via a GUI control
