@@ -376,16 +376,23 @@ namespace PLCHESerialDebugger
             string cmdString = txtCmdString.Text;
             string cmdArgument = txtCmdArgument.Text;
             string textData = $"{cmdString} {cmdArgument}";
+            string[] substringsToCheck = { "get-page", "help" };
 
             try
             {
                 LogController.AddLogMessage(new LogMessage(text: $"Writing '{textData}'", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow, useTimeStamp: true));
                 PLCGatewayController.SendPLCGatewayPacket(textData);
-                Thread.Sleep(100);
 
+                if (substringsToCheck.Any(textData.Contains))
+                {
+                    Thread.Sleep(5000); // huge delay
+                }
+                else
+                {
+                    Thread.Sleep(100); // typical delay
+                }
+                    
                 string rxData = await PLCGatewayController.RetrievePLCGatewayPacket();
-
-                //PLCGatewayController.RetrievePLCGatewayPacket();
             }
             catch (Exception ex)
             {
