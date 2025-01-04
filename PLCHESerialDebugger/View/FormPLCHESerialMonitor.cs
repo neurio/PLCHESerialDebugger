@@ -251,11 +251,15 @@ namespace PLCHESerialDebugger
         }
 
         // Timer Tick event handler
-        private void UIUpdateTimer_Tick(object sender, EventArgs e)
+        private async void UIUpdateTimer_Tick(object sender, EventArgs e)
         {
             if (PLCGatewayController.PersistentPollingEnabled == true)
             {
-                string newRXData = PLCGatewayController.ReadAndUpdateInputBuffer(); // should only write new entries
+                PLCGatewayController.SendPLCGatewayPacket("plc-get-page-dump 0");
+
+                
+                string newRXData = PLCGatewayController.ReadAndUpdateInputBuffer(); // Assuming telemetry data is posted cyclically, NOT requested.
+                await PLCGatewayController.RetrievePLCGatewayPacket();
 
                 if (newRXData != null || newRXData != string.Empty)
                 {
