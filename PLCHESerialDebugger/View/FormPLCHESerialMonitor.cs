@@ -36,7 +36,7 @@ namespace PLCHESerialDebugger
 
         public LogController LogController { get; set; }
 
-        public List<string> SupportedBaudRates { get; set; } = new List<string>() { "115200", "57600", "38400", "19200", "9600"};
+        public List<string> SupportedBaudRates { get; set; } = new List<string>() { "115200", "57600", "38400", "19200", "9600" };
 
         public PLCHESerialMonitorForm()
         {
@@ -67,6 +67,8 @@ namespace PLCHESerialDebugger
 
         public void SystemBaseDataBindingLog_ListChanged(object sender, ListChangedEventArgs e)
         {
+            // ListBoxSystemLog.TopIndex = (ListBoxSystemLog.Items.Count - 1);
+            ListBoxSystemLog.SelectedIndex = (ListBoxSystemLog.Items.Count - 1);
             // run naunced GUI update logic here
         }
 
@@ -391,7 +393,7 @@ namespace PLCHESerialDebugger
                 {
                     Thread.Sleep(100); // typical delay
                 }
-                    
+
                 string rxData = await PLCGatewayController.RetrievePLCGatewayPacket();
             }
             catch (Exception ex)
@@ -443,6 +445,11 @@ namespace PLCHESerialDebugger
         }
 
         private void bindingSourceCOMPorts_CurrentChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void PLCHESerialMonitorForm_Load(object sender, EventArgs e)
         {
 
         }

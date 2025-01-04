@@ -62,6 +62,7 @@
             ClientSize = new Size(800, 450);
             Name = "PLCHESerialMonitorForm";
             Text = "Form1";
+            Load += PLCHESerialMonitorForm_Load;
             ((System.ComponentModel.ISupportInitialize)bindingSourceRXData).EndInit();
             ((System.ComponentModel.ISupportInitialize)bindingSourceSystemBaseData).EndInit();
             ((System.ComponentModel.ISupportInitialize)bindingSourceTelemetryData).EndInit();
