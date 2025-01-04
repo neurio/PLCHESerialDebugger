@@ -246,7 +246,7 @@ namespace PLCHESerialDebugger
             Controls.Add(chkTogglePLCGatewayType);
 
             // UI Update Timer
-            UIUpdateTimer.Interval = 100; // Set interval to 100ms
+            UIUpdateTimer.Interval = 3000; // Set interval to 100ms
             UIUpdateTimer.Tick += UIUpdateTimer_Tick; // Add event handler for the Tick event
         }
 
@@ -255,9 +255,8 @@ namespace PLCHESerialDebugger
         {
             if (PLCGatewayController.PersistentPollingEnabled == true)
             {
-                PLCGatewayController.SendPLCGatewayPacket("plc-get-page-dump 0");
-
-                
+                PLCGatewayController.SendPLCGatewayPacket("plc-page-dump -i2");
+              
                 string newRXData = PLCGatewayController.ReadAndUpdateInputBuffer(); // Assuming telemetry data is posted cyclically, NOT requested.
                 await PLCGatewayController.RetrievePLCGatewayPacket();
 
@@ -391,7 +390,7 @@ namespace PLCHESerialDebugger
 
                 if (substringsToCheck.Any(textData.Contains))
                 {
-                    Thread.Sleep(5000); // huge delay
+                    Thread.Sleep(3000); // huge delay
                 }
                 else
                 {
