@@ -19,13 +19,21 @@ namespace PLCHESerialDebugger
 
         public List<LogMessage> SerialLog = new List<LogMessage>();
 
+        public List<LogMessage> TelemetryLog = new List<LogMessage>();
+
         public BindingList<string> SerialDataBindingLog { get; set; } = new BindingList<string>();
 
         public BindingList<string> SystemBaseDataBindingLog { get; set; } = new BindingList<string>();
 
+        public BindingList<string> TelemetryDataBindingLog { get; set; } = new BindingList<string>();
+
+        public BindingList<Dictionary<int, List<LogMessage>>> TelemetryDataDictionaryBindingLog { get; set; } = new BindingList<Dictionary<int, List<LogMessage>>>(); // will use for n MI worth of telemetry
+
         public static int LastSyncedSerialDataIndex { get; set; } = 0;
 
         public static int LastSyncedSystemBaseDataIndex { get; set; } = 0;
+
+        public static int LastSyncedTelemetryDataIndex { get; set; } = 0;
 
         private static readonly Regex logPattern = new Regex(@"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}:\d{3}): (.+)$");
 
@@ -53,7 +61,7 @@ namespace PLCHESerialDebugger
                         break;
                     }
                 case LogMessage.messageType.Serial:
-                {
+                    {
                         Match match = logPattern.Match(message.Text);
                         if(match.Success)
                         {
@@ -61,20 +69,30 @@ namespace PLCHESerialDebugger
                             SyncSerialDataBindingLog(); // For GUI
                         }
                         break;
-                }
+                    }
+                case LogMessage.messageType.Telemetry:
+                    {
+                        TelemetryLog.Add(message);
+                        SyncTelemetryDataBindingLog();
+                        break;
+                    }
             }
         }
 
-        public void SyncSerialDataBindingLog()
+        public void SyncTelemetryDataBindingLog()
         {
-            for (int x = LastSyncedSerialDataIndex; x < SerialLog.Count; x++)
+            for (int x = LastSyncedTelemetryDataIndex; x < TelemetryLog.Count; x++)
             {
-                var logMessage = SerialLog[x];
-                string formattedLog = $"{logMessage.Text}";
-                SerialDataBindingLog.Add(formattedLog);
+                var logMessage = TelemetryLog[x];
+                var lines = logMessage.Text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+
+                foreach (var line in lines)
+                {
+                    TelemetryDataBindingLog.Add(line);
+                }
             }
 
-            LastSyncedSerialDataIndex = SerialLog.Count; // Update the synced index
+            LastSyncedTelemetryDataIndex = TelemetryLog.Count; // Update the synced index
         }
 
         public void SyncSystemBaseDataBindingLog()
@@ -88,14 +106,26 @@ namespace PLCHESerialDebugger
                 {
                     SystemBaseDataBindingLog.Add(line);
                 }
-
-                // string formattedLog = $"{logMessage.Text}";
-                // SystemBaseDataBindingLog.Add(formattedLog);
             }
 
             LastSyncedSystemBaseDataIndex = BaseLog.Count; // Update the synced index
         }
+
+
+        public void SyncSerialDataBindingLog()
+        {
+            for (int x = LastSyncedSerialDataIndex; x < SerialLog.Count; x++)
+            {
+                var logMessage = SerialLog[x];
+                string formattedLog = $"{logMessage.Text}";
+                SerialDataBindingLog.Add(formattedLog);
+            }
+
+            LastSyncedSerialDataIndex = SerialLog.Count; // Update the synced index
+        }
     }
+
+
 
     public class LogMessage
     {
@@ -111,6 +141,7 @@ namespace PLCHESerialDebugger
             VISA,
             UDP,
             Serial,
+            Telemetry,
         }
 
         public LogMessage(string text, messageType messageType, DateTime timeStamp, bool? useTimeStamp = false)

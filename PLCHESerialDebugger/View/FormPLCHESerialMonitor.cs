@@ -12,8 +12,6 @@ namespace PLCHESerialDebugger
 
         public ListBox ListBoxSystemLog { get; set; }
 
-        public ListBox ListBoxTelemetryMonitor { get; set; }
-
         public TextBox txtCmdString { get; set; }
 
         public TextBox txtCmdArgument { get; set; }
@@ -54,9 +52,9 @@ namespace PLCHESerialDebugger
         {
             LogController.SerialDataBindingLog.ListChanged += SerialDataBindingLog_ListChanged;
             LogController.SystemBaseDataBindingLog.ListChanged += SystemBaseDataBindingLog_ListChanged;
+            LogController.TelemetryDataBindingLog.ListChanged += TelemetryDataBindingLog_ListChanged;
 
             PLCGatewayController.COMPortsBindingList.ListChanged += COMPortsBindingList_ListChanged;
-            PLCGatewayController.TelemetryDataBindingLog.ListChanged += TelemetryDataBindingLog_ListChanged;
         }
 
         public void SerialDataBindingLog_ListChanged(object sender, ListChangedEventArgs e)
@@ -86,14 +84,13 @@ namespace PLCHESerialDebugger
         {
             // Bind WinForm control to BindingList
             ListBoxSystemLog.DataSource = bindingSourceSystemBaseData;
-            ListBoxTelemetryMonitor.DataSource = bindingSourceTelemetryData;
             ComboBoxForCOMPorts.DataSource = bindingSourceCOMPorts;
 
             // Relate BindingList to 'normal' datatypes
             bindingSourceRXData.DataSource = LogController.SerialDataBindingLog;
             bindingSourceSystemBaseData.DataSource = LogController.SystemBaseDataBindingLog;
+
             bindingSourceCOMPorts.DataSource = PLCGatewayController.COMPortsBindingList;
-            bindingSourceTelemetryData.DataSource = PLCGatewayController.TelemetryDataBindingLog;
         }
 
         private void CreateDynamicControls()
@@ -111,17 +108,6 @@ namespace PLCHESerialDebugger
             ListBoxSystemLog.HorizontalScrollbar = true;
             ListBoxSystemLog.ScrollAlwaysVisible = true;
             Controls.Add(ListBoxSystemLog);
-
-            // === Telemetry Data Window ===
-            var lblTelemetry = FormUtilities.CreateLabel("Telemetry Data", 0.01f, 0.40f, this);
-            lblTelemetry.Font = new Font("Calibri Light", 16, FontStyle.Bold);
-            lblTelemetry.BackColor = Color.Transparent;
-            lblTelemetry.BorderStyle = BorderStyle.Fixed3D;
-            lblTelemetry.Padding = new Padding(2);
-            Controls.Add(lblTelemetry);
-
-            ListBoxTelemetryMonitor = FormUtilities.CreateListBox(0.01f, 0.44f, 0.98f, 0.1f, this); // Full width
-            Controls.Add(ListBoxTelemetryMonitor);
 
             // === Serial Port Configurations ===
             var lblSerialPortConfiguration = FormUtilities.CreateLabel("Serial Port Config.", 0.01f, 0.64f, this);
@@ -262,14 +248,20 @@ namespace PLCHESerialDebugger
             /// 1. Convert logmessagetype to typetelemetry
             /// 2. create new datagridview for telemetetrydata, store telemetry data into a datatable, each column representing a row from page0 and the value corresponding with each datatable entry.
             ///             THINK MORE ABOUT THE STRUCTURE FOR TELEMETRY DataTable/DataGridView implementation
-            /// 
+            /// it is possible to spawn a list box, initialize a databindingsource, attach a string list to databindingsource, etc. at runtime
+            /// for now, we will write to one; will expand to n (limited to width of form window) worth of telemetry tables when appropriate.
+
+            // need some identifier mechanism that allows me to know that this packet is page data
+            // this polling task and serial writes can happen around each other.
+
+
 
             if (PLCGatewayController.PersistentPollingEnabled == true)
             {
                 PLCGatewayController.SendPLCGatewayPacket("plc-page-dump -i2");
               
                 string newRXData = PLCGatewayController.ReadAndUpdateInputBuffer(); // Assuming telemetry data is posted cyclically, NOT requested.
-                await PLCGatewayController.RetrievePLCGatewayPacket();
+                await PLCGatewayController.RetrievePLCGatewayPacket(isTelemetryPacket: true);
 
                 if (newRXData != null || newRXData != string.Empty)
                 {
@@ -401,14 +393,15 @@ namespace PLCHESerialDebugger
 
                 if (substringsToCheck.Any(textData.Contains))
                 {
-                    Thread.Sleep(3000); // huge delay
+                    // can maybe do something like task.run(() => new taskName)?
+                    Thread.Sleep(5000); // huge delay
                 }
                 else
                 {
                     Thread.Sleep(100); // typical delay
                 }
 
-                string rxData = await PLCGatewayController.RetrievePLCGatewayPacket();
+                string rxData = await PLCGatewayController.RetrievePLCGatewayPacket(isTelemetryPacket: false);
             }
             catch (Exception ex)
             {

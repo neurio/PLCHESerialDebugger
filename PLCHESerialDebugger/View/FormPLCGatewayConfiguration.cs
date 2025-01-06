@@ -18,6 +18,10 @@ namespace PLCHESerialDebugger
 
         public TextBox txtNodeID { get; set; }
 
+        public ListBox ListBoxTelemetryMonitor { get; set; }
+
+        public Dictionary<int, ListBox> TelemetryListBoxes { get; set; } = new Dictionary<int, ListBox>(); // <NodeID, (associated) ListBox)
+
         public FormPLCGatewayConfiguration(PLCGatewayController plcGatewayController, LogController logController)
         {
             LogController = logController;
@@ -25,7 +29,14 @@ namespace PLCHESerialDebugger
             InitializeComponent();
             FormUtilities.ResizeFormWindow(0.4f, 0.4f, this); // if these values change, it impacts where all controls get placed; leave alone for now.
             CreateDynamicControls(); // Add our dynamic controls
+            AttachDataSources();
             LockSerialControls();
+        }
+
+        private void AttachDataSources()
+        {
+            ListBoxTelemetryMonitor.DataSource = bindingSourceTelemetryData;
+            bindingSourceTelemetryData.DataSource = LogController.TelemetryDataBindingLog;
         }
 
         private void LockSerialControls()
@@ -83,13 +94,24 @@ namespace PLCHESerialDebugger
             txtNodeID = FormUtilities.CreateTextBox(0.11f, 0.4f, 0.15f, 0.03f, this);
             txtNodeID.Font = new Font("Calibri Light", 12);
             Controls.Add(txtNodeID);
+
+            // === Telemetry Data Window ===
+            var lblTelemetry = FormUtilities.CreateLabel("Telemetry Data", 0.30f, 0.01f, this);
+            lblTelemetry.Font = new Font("Calibri Light", 16, FontStyle.Bold);
+            lblTelemetry.BackColor = Color.Transparent;
+            lblTelemetry.BorderStyle = BorderStyle.Fixed3D;
+            lblTelemetry.Padding = new Padding(2);
+            Controls.Add(lblTelemetry);
+
+            ListBoxTelemetryMonitor = FormUtilities.CreateListBox(0.30f, 0.09f, 0.15f, 0.75f, this);
+            Controls.Add(ListBoxTelemetryMonitor);
         }
 
         private async void btnDumpIt900_Click(object sender, EventArgs e)
         {
             PLCGatewayController.GetIT900Data();
             Thread.Sleep(100);
-            string rxData = await PLCGatewayController.RetrievePLCGatewayPacket();
+            string rxData = await PLCGatewayController.RetrievePLCGatewayPacket(isTelemetryPacket: false);
         }
 
         private async void btnAddNode_Click(object sender, EventArgs e)

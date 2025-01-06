@@ -28,6 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
+            bindingSourceTelemetryData = new BindingSource(components);
+            ((System.ComponentModel.ISupportInitialize)bindingSourceTelemetryData).BeginInit();
             SuspendLayout();
             // 
             // FormPLCGatewayConfiguration
@@ -37,9 +40,12 @@
             ClientSize = new Size(654, 380);
             Name = "FormPLCGatewayConfiguration";
             Text = "PLC Configuration";
+            ((System.ComponentModel.ISupportInitialize)bindingSourceTelemetryData).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
+
+        private BindingSource bindingSourceTelemetryData;
     }
 }

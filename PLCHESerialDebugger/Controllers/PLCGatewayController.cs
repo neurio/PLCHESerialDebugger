@@ -43,8 +43,6 @@ namespace PLCHESerialDebugger
 
         public LogController LogController { get; set; }
 
-        public BindingList<string> TelemetryDataBindingLog { get; set; } = new BindingList<string>();
-
         public BindingList<string> COMPortsBindingList { get; set; } = new BindingList<string>();
 
 
@@ -62,7 +60,7 @@ namespace PLCHESerialDebugger
         {
             SendPLCGatewayPacket($"it900-nodes");
             Thread.Sleep(100);
-            string NodeList = await RetrievePLCGatewayPacket();
+            string NodeList = await RetrievePLCGatewayPacket(isTelemetryPacket: false);
 
             return NodeList;
         }
@@ -85,6 +83,9 @@ namespace PLCHESerialDebugger
 
         public void EnablePersistentPolling()
         {
+            // need some identifier mechanism that allows me to know that this packet is page data
+            // this polling task and serial writes can happen around each other.
+
             try
             {
                 PLCGateway.BeginPersistentPolling();
@@ -194,14 +195,22 @@ namespace PLCHESerialDebugger
             }
         }
 
-        public async Task<string> RetrievePLCGatewayPacket()
+        public async Task<string> RetrievePLCGatewayPacket(bool isTelemetryPacket)
         {
             string returnValue = "plc packet retrieval error";
 
             try
             {
                 returnValue = await PLCGateway.ReadRawString();
-                LogController.AddLogMessage(new LogMessage(text: $" {returnValue}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+
+                if (isTelemetryPacket)
+                {
+                    LogController.AddLogMessage(new LogMessage(text: $" {returnValue}", messageType: LogMessage.messageType.Telemetry, timeStamp: DateTime.UtcNow));
+                }
+                else
+                {
+                    LogController.AddLogMessage(new LogMessage(text: $" {returnValue}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+                }
             }
             catch (Exception ex)
             {
