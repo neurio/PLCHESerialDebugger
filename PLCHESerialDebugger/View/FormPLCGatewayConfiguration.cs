@@ -16,6 +16,8 @@ namespace PLCHESerialDebugger
 
         public Button btnListNodes { get; set; }
 
+        public TextBox txtNodeID { get; set; }
+
         public FormPLCGatewayConfiguration(PLCGatewayController plcGatewayController, LogController logController)
         {
             LogController = logController;
@@ -69,6 +71,18 @@ namespace PLCHESerialDebugger
             btnListNodes.Click += btnListNodes_Click;
             btnListNodes.Font = new Font("Calibri Light", 14);
             Controls.Add(btnListNodes);
+
+            // === Node ID TextBox ===
+            var lblNodeID = FormUtilities.CreateLabel("Node ID:", 0.01f, 0.4f, this);
+            lblNodeID.Font = new Font("Calibri Light", 14, FontStyle.Bold);
+            lblNodeID.BackColor = Color.Transparent;
+            lblNodeID.BorderStyle = BorderStyle.Fixed3D;
+            lblNodeID.Padding = new Padding(2);
+            Controls.Add(lblNodeID);
+
+            txtNodeID = FormUtilities.CreateTextBox(0.11f, 0.4f, 0.15f, 0.03f, this);
+            txtNodeID.Font = new Font("Calibri Light", 12);
+            Controls.Add(txtNodeID);
         }
 
         private async void btnDumpIt900_Click(object sender, EventArgs e)
@@ -81,15 +95,33 @@ namespace PLCHESerialDebugger
         private async void btnAddNode_Click(object sender, EventArgs e)
         {
             int NodeID = -1;
+            
+            if (txtNodeID.Text.Length > 0)
+            {
+                if (!int.TryParse(txtNodeID.Text, out NodeID))
+                {
+                    LogController.AddLogMessage(new LogMessage(text: $"Invalid Node ID: {txtNodeID.Text}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+                }
+            }
+
             PLCGatewayController.AddNode(NodeID);
-            LogController.AddLogMessage(new LogMessage(text: $"Adding Node: {NodeID}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            LogController.AddLogMessage(new LogMessage(text: $"Added Node: {NodeID}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));            
         }
 
         private async void btnDeleteNode_Click(object sender, EventArgs e)
         {
             int NodeID = -1;
+
+            if (txtNodeID.Text.Length > 0)
+            {
+                if(!int.TryParse(txtNodeID.Text, out NodeID))
+                {
+                    LogController.AddLogMessage(new LogMessage(text: $"Invalid Node ID: {txtNodeID.Text}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+                }
+            }
+
             PLCGatewayController.DeleteNode(NodeID);
-            LogController.AddLogMessage(new LogMessage(text: $"Deleting Node: {NodeID}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            LogController.AddLogMessage(new LogMessage(text: $"Deleted Node: {NodeID}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
         }
 
         private async void btnListNodes_Click(object sender, EventArgs e)
@@ -98,7 +130,6 @@ namespace PLCHESerialDebugger
             int tempIndex = 1;
             string IdentifiedNodes = await PLCGatewayController.ListVisibleNodes();
             LogController.AddLogMessage(new LogMessage(text: $"Visible Nodes:", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
-
         }
     }
 }
