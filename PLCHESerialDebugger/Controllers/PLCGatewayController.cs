@@ -48,6 +48,25 @@ namespace PLCHESerialDebugger
         public BindingList<string> COMPortsBindingList { get; set; } = new BindingList<string>();
 
 
+        public void AddNode(int nodeID)
+        {
+            SendPLCGatewayPacket($"it900-node-add {nodeID}");
+        }
+
+        public void DeleteNode(int nodeID)
+        {
+            SendPLCGatewayPacket($"it900-node-del {nodeID}");
+        }
+
+        public async Task<string> ListVisibleNodes()
+        {
+            SendPLCGatewayPacket($"it900-nodes");
+            Thread.Sleep(100);
+            string NodeList = await RetrievePLCGatewayPacket();
+
+            return NodeList;
+        }
+
         public void GetIT900Data()
         {
             SendPLCGatewayPacket("it900");

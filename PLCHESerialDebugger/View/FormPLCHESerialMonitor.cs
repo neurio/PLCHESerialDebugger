@@ -240,8 +240,9 @@ namespace PLCHESerialDebugger
             Controls.Add(btnClearSystemLog);
 
             // === Enable Serial Checkbox ===
-            chkTogglePLCGatewayType = FormUtilities.CreateCheckBox("Serial Comm.", 0.11f, 0.66f, 0.2f, 0.04f, this); // Placed closer to other controls
+            chkTogglePLCGatewayType = FormUtilities.CreateCheckBox("Serial PLCHE", 0.11f, 0.66f, 0.2f, 0.04f, this); // Placed closer to other controls
             chkTogglePLCGatewayType.Font = new Font("Calibri Light", 12, FontStyle.Bold);
+            chkTogglePLCGatewayType.CheckState = CheckState.Checked;
             chkTogglePLCGatewayType.CheckedChanged += ChkTogglePLCGatewayType_CheckedChanged;
             Controls.Add(chkTogglePLCGatewayType);
 
