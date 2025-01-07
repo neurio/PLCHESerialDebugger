@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.IO.Ports;
+using System.Media;
 using PLCHESerialDebugger.Utilities;
 
 namespace PLCHESerialDebugger
@@ -31,6 +32,8 @@ namespace PLCHESerialDebugger
         public Button btnSetUL1741TestMode { get; set; }
 
         public Button btnSetDCSupplyMode { get; set; }
+
+        public Button btnHelp { get; set; }
 
         public System.Windows.Forms.Timer UIUpdateTimer { get; set; } = new System.Windows.Forms.Timer();
 
@@ -248,6 +251,14 @@ namespace PLCHESerialDebugger
             btnSetDCSupplyMode.Font = new Font("Calibri Light", 14);
             Controls.Add(btnSetDCSupplyMode);
 
+            // === Help Button ===
+            btnHelp = FormUtilities.CreateButton("Help", 0.21f, 0.79f, 0.1f, 0.06f, this);
+            btnHelp.Click += BtnHelp_Click;
+            btnHelp.Font = new Font("Calibri Light", 14);
+            btnHelp.BackColor = Color.PaleGreen;
+            Controls.Add(btnHelp);
+
+
             // === Enable Serial Checkbox ===
             chkTogglePLCGatewayType = FormUtilities.CreateCheckBox("Serial PLCHE", 0.11f, 0.66f, 0.2f, 0.04f, this); // Placed closer to other controls
             chkTogglePLCGatewayType.Font = new Font("Calibri Light", 12, FontStyle.Bold);
@@ -378,9 +389,14 @@ namespace PLCHESerialDebugger
             {
                 txtCmdString.Enabled = false;
                 txtCmdArgument.Enabled = false;
+
                 chkPollingEnabled.Enabled = false;
-                btnSendCmd.Enabled = false;
                 chkTogglePLCGatewayType.Enabled = true;
+
+                btnSendCmd.Enabled = false;
+                btnSetDCSupplyMode.Enabled = false;
+                btnSetUL1741TestMode.Enabled = false;
+                btnHelp.Enabled = false;                
             }
         }
 
@@ -428,6 +444,11 @@ namespace PLCHESerialDebugger
         private async void BtnSetDCSupplyMode_Click(object sender, EventArgs e)
         {
             PLCGatewayController.EnableDCSupplyMode();
+        }
+
+        private async void BtnHelp_Click(object sender, EventArgs e)
+        {
+            PLCGatewayController.GetHelpMessage(); // can Ignore flag return - better to avoid async Task<void> even if return is useless.
         }
 
         private async void BtnScanSerialPorts_Click(object sender, EventArgs e)

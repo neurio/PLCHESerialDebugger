@@ -107,13 +107,32 @@ namespace PLCHESerialDebugger
             SetParameter(3, 1);
         }
 
+        public async Task<bool> GetHelpMessage()
+        {
+            bool cmdSent;
+            
+            SendPLCGatewayPacket($"help");
+            string result = await RetrievePLCGatewayPacket(isTelemetryPacket: false, msTimeout: 5000);
+            
+            if (result != string.Empty)
+            {
+                cmdSent = true;
+            }
+            else
+            {
+                cmdSent = false;
+            }
+
+            return cmdSent;
+        }
+
         public async Task<bool> AddNode(int nodeID)
         {
             bool success;
             SendPLCGatewayPacket($"it900-node-add {nodeID}");
             string result = await RetrievePLCGatewayPacket(isTelemetryPacket: false, msTimeout: 20000);
             
-            if (result.Contains(""))
+            if (result.Contains("Success"))
             {
                 success = true;
             }
@@ -131,7 +150,7 @@ namespace PLCHESerialDebugger
             SendPLCGatewayPacket($"it900-node-del {nodeID}");
             string result = await RetrievePLCGatewayPacket(isTelemetryPacket: false);
             
-            if (result.Contains(""))
+            if (result.Contains("Deleted"))
             {
                 success = true;
             }
