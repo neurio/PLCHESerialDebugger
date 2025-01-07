@@ -55,7 +55,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             Name = "PLCHESerialMonitorForm";
-            Text = "Form1";
+            Text = "PLCHE Serial Debugger";
             Load += PLCHESerialMonitorForm_Load;
             ((System.ComponentModel.ISupportInitialize)bindingSourceRXData).EndInit();
             ((System.ComponentModel.ISupportInitialize)bindingSourceSystemBaseData).EndInit();

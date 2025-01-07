@@ -28,6 +28,10 @@ namespace PLCHESerialDebugger
 
         public Button btnClearSystemLog { get; set; }
 
+        public Button btnSetUL1741TestMode { get; set; }
+
+        public Button btnSetDCSupplyMode { get; set; }
+
         public System.Windows.Forms.Timer UIUpdateTimer { get; set; } = new System.Windows.Forms.Timer();
 
         public PLCGatewayController PLCGatewayController { get; set; }
@@ -46,6 +50,13 @@ namespace PLCHESerialDebugger
             AttachDataSources();
             AttachCustomEventHandlers();
             LockSerialControls();
+
+            Resize += new EventHandler(PLCHESerialMonitorForm_Resize);
+        }
+
+        private void PLCHESerialMonitorForm_Resize(object sender, EventArgs e)
+        {
+            FormUtilities.AdjustControlsSizesAndPositions(this);
         }
 
         public void AttachCustomEventHandlers()
@@ -221,9 +232,21 @@ namespace PLCHESerialDebugger
 
             // === Clear System Log Button ===
             btnClearSystemLog = FormUtilities.CreateButton("Clear Log", 0.31f, 0.75f, 0.1f, 0.04f, this);
-            btnClearSystemLog.Click += btnClearSystemLog_Click;
+            btnClearSystemLog.Click += BtnClearSystemLog_Click;
             btnClearSystemLog.Font = new Font("Calibri Light", 14);
             Controls.Add(btnClearSystemLog);
+
+            // === Enable UL1741 Mode Button ===
+            btnSetUL1741TestMode = FormUtilities.CreateButton("Enable UL1741 Test Mode", 0.11f, 0.79f, 0.1f, 0.06f, this);
+            btnSetUL1741TestMode.Click += BtnSetUL1741TestMode_Click;
+            btnSetUL1741TestMode.Font = new Font("Calibri Light", 14);
+            Controls.Add(btnSetUL1741TestMode);
+
+            // === Enable DC Supply Mode Button ===
+            btnSetDCSupplyMode = FormUtilities.CreateButton("Enable DC Supply Mode", 0.01f, 0.79f, 0.1f, 0.06f, this);
+            btnSetDCSupplyMode.Click += BtnSetDCSupplyMode_Click;
+            btnSetDCSupplyMode.Font = new Font("Calibri Light", 14);
+            Controls.Add(btnSetDCSupplyMode);
 
             // === Enable Serial Checkbox ===
             chkTogglePLCGatewayType = FormUtilities.CreateCheckBox("Serial PLCHE", 0.11f, 0.66f, 0.2f, 0.04f, this); // Placed closer to other controls
@@ -259,14 +282,8 @@ namespace PLCHESerialDebugger
             if (PLCGatewayController.PersistentPollingEnabled == true)
             {
                 PLCGatewayController.SendPLCGatewayPacket("plc-page-dump -i2");
-              
-                string newRXData = PLCGatewayController.ReadAndUpdateInputBuffer(); // Assuming telemetry data is posted cyclically, NOT requested.
-                await PLCGatewayController.RetrievePLCGatewayPacket(isTelemetryPacket: true);
-
-                if (newRXData != null || newRXData != string.Empty)
-                {
-                    // do UI update if needed 
-                }
+                string returnedData = await PLCGatewayController.RetrievePLCGatewayPacket(isTelemetryPacket: true); // Telemetry Data parsed within AddLogMessage()
+                // string newRXData = PLCGatewayController.ReadAndUpdateInputBuffer(); // Assuming telemetry data is posted cyclically, NOT requested.
             }
         }
 
@@ -334,17 +351,11 @@ namespace PLCHESerialDebugger
 
         private void BtnPLCConfiguration_Click(object sender, EventArgs e)
         {
-            // need to spawn a new form here
-            // cannot block the current thread
-            // should exist adjacent to current screen
-            // both forms should be editable at once
-            // the 2nd form will have to update values in PLCGatewayController so ideally this form will be passed this controller object too
-
             FormPLCGatewayConfiguration formPLCGatewayConfiguration = new FormPLCGatewayConfiguration(PLCGatewayController, LogController);
-            formPLCGatewayConfiguration.Show(); // Open Form2 non-blocking
+            formPLCGatewayConfiguration.Show(); // non-blocking
         }
 
-        private void btnClearSystemLog_Click(object sender, EventArgs e)
+        private void BtnClearSystemLog_Click(object sender, EventArgs e)
         {
             LogController.SystemBaseDataBindingLog.Clear();
         }
@@ -407,6 +418,16 @@ namespace PLCHESerialDebugger
             {
                 LogController.AddLogMessage(new LogMessage(text: $"{ex.ToString()}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
             }
+        }
+
+        private async void BtnSetUL1741TestMode_Click(object sender, EventArgs e)
+        {
+            PLCGatewayController.EnableUL1741TestMode();
+        }
+
+        private async void BtnSetDCSupplyMode_Click(object sender, EventArgs e)
+        {
+            PLCGatewayController.EnableDCSupplyMode();
         }
 
         private async void BtnScanSerialPorts_Click(object sender, EventArgs e)

@@ -31,6 +31,13 @@ namespace PLCHESerialDebugger
             CreateDynamicControls(); // Add our dynamic controls
             AttachDataSources();
             LockSerialControls();
+
+            Resize += new EventHandler(FormPLCGatewayConfiguration_Resize);
+        }
+
+        private void FormPLCGatewayConfiguration_Resize(object sender, EventArgs e)
+        {
+            FormUtilities.AdjustControlsSizesAndPositions(this);
         }
 
         private void AttachDataSources()
@@ -103,7 +110,7 @@ namespace PLCHESerialDebugger
             lblTelemetry.Padding = new Padding(2);
             Controls.Add(lblTelemetry);
 
-            ListBoxTelemetryMonitor = FormUtilities.CreateListBox(0.30f, 0.09f, 0.15f, 0.75f, this);
+            ListBoxTelemetryMonitor = FormUtilities.CreateListBox(0.30f, 0.09f, 0.165f, 0.75f, this);
             Controls.Add(ListBoxTelemetryMonitor);
         }
 
@@ -117,7 +124,7 @@ namespace PLCHESerialDebugger
         private async void btnAddNode_Click(object sender, EventArgs e)
         {
             int NodeID = -1;
-            
+
             if (txtNodeID.Text.Length > 0)
             {
                 if (!int.TryParse(txtNodeID.Text, out NodeID))
@@ -126,8 +133,16 @@ namespace PLCHESerialDebugger
                 }
             }
 
-            PLCGatewayController.AddNode(NodeID);
-            LogController.AddLogMessage(new LogMessage(text: $"Added Node: {NodeID}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));            
+            bool addedNode = await PLCGatewayController.AddNode(NodeID);
+
+            if (addedNode)
+            {
+                LogController.AddLogMessage(new LogMessage(text: $"Added Node: {NodeID}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            }
+            else
+            {
+                LogController.AddLogMessage(new LogMessage(text: $"Failed to Add Node ID: {NodeID}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            }
         }
 
         private async void btnDeleteNode_Click(object sender, EventArgs e)
@@ -136,14 +151,22 @@ namespace PLCHESerialDebugger
 
             if (txtNodeID.Text.Length > 0)
             {
-                if(!int.TryParse(txtNodeID.Text, out NodeID))
+                if (!int.TryParse(txtNodeID.Text, out NodeID))
                 {
                     LogController.AddLogMessage(new LogMessage(text: $"Invalid Node ID: {txtNodeID.Text}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
                 }
             }
 
-            PLCGatewayController.DeleteNode(NodeID);
-            LogController.AddLogMessage(new LogMessage(text: $"Deleted Node: {NodeID}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            bool deletedNode = await PLCGatewayController.DeleteNode(NodeID);
+
+            if (deletedNode)
+            {
+                LogController.AddLogMessage(new LogMessage(text: $"Deleted Node: {NodeID}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            }
+            else
+            {
+                LogController.AddLogMessage(new LogMessage(text: $"Failed to Delete Node ID: {NodeID}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+            }
         }
 
         private async void btnListNodes_Click(object sender, EventArgs e)

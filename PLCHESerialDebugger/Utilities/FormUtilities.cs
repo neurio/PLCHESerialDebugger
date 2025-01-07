@@ -2,6 +2,16 @@
 {
     public static class FormUtilities
     {
+        public static void AdjustControlsSizesAndPositions(Form form)
+        {
+            foreach (Control control in form.Controls)
+            {
+                float xRatio = control.Location.X / (float)form.ClientSize.Width;
+                float yRatio = control.Location.Y / (float)form.ClientSize.Height;
+                control.Location = new Point((int)(form.ClientSize.Width * xRatio), (int)(form.ClientSize.Height * yRatio));
+            }
+        }
+
         public static ComboBox CreateComboBox(float xRatio, float yRatio, float widthRatio, float heightRatio, Form form)
         {
             var comboBox = new ComboBox
@@ -65,7 +75,7 @@
             {
                 Text = text,
                 Location = new Point((int)(form.ClientSize.Width * xRatio), (int)(form.ClientSize.Height * yRatio)),
-                Size = new Size((int)(form.ClientSize.Width * widthRatio), (int)(form.ClientSize.Height * heightRatio))
+                Size = new Size((int)(form.ClientSize.Width * widthRatio), (int)(form.ClientSize.Height * heightRatio)),
             };
             return button;
         }
