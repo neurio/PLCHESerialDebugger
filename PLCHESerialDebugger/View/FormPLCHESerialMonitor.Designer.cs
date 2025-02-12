@@ -31,8 +31,10 @@
             components = new System.ComponentModel.Container();
             bindingSourceRXData = new BindingSource(components);
             bindingSourceSystemBaseData = new BindingSource(components);
+            bindingSourceCOMPorts = new BindingSource(components);
             ((System.ComponentModel.ISupportInitialize)bindingSourceRXData).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bindingSourceSystemBaseData).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)bindingSourceCOMPorts).BeginInit();
             SuspendLayout();
             // 
             // bindingSourceRXData
@@ -43,15 +45,21 @@
             // 
             bindingSourceSystemBaseData.CurrentChanged += bindingSourceSystemBaseData_CurrentChanged;
             // 
+            // bindingSourceCOMPorts
+            // 
+            bindingSourceCOMPorts.CurrentChanged += bindingSourceCOMPorts_CurrentChanged;
+            // 
             // PLCHESerialMonitorForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             Name = "PLCHESerialMonitorForm";
-            Text = "Form1";
+            Text = "PLCHE Serial Debugger";
+            Load += PLCHESerialMonitorForm_Load;
             ((System.ComponentModel.ISupportInitialize)bindingSourceRXData).EndInit();
             ((System.ComponentModel.ISupportInitialize)bindingSourceSystemBaseData).EndInit();
+            ((System.ComponentModel.ISupportInitialize)bindingSourceCOMPorts).EndInit();
             ResumeLayout(false);
         }
 
@@ -59,5 +67,6 @@
 
         private BindingSource bindingSourceRXData;
         private BindingSource bindingSourceSystemBaseData;
+        private BindingSource bindingSourceCOMPorts;
     }
 }
