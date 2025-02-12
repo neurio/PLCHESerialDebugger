@@ -380,6 +380,11 @@ namespace PLCHESerialDebugger
                 chkPollingEnabled.Enabled = true;
                 btnSendCmd.Enabled = true;
                 chkTogglePLCGatewayType.Enabled = false;
+
+                btnSendCmd.Enabled = true;
+                btnSetDCSupplyMode.Enabled = true;
+                btnSetUL1741TestMode.Enabled = true;
+                btnHelp.Enabled = true;
             }
         }
 

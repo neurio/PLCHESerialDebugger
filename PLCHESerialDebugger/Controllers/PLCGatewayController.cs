@@ -273,9 +273,19 @@ namespace PLCHESerialDebugger
                         }
                 }
 
-                GatewayInit = true;
-                LogController.AddLogMessage(new LogMessage(text: $"{PLCGateway.GetType()} init. and ready to use.", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
-                return true;
+                if (PLCGateway != null)
+                {
+                    if (!PLCGateway.CommEstablished)
+                    {
+                        LogController.AddLogMessage(new LogMessage(text: $"{PLCGateway.GetType()} init. failed.", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+                        GatewayInit = false;
+                        return false;
+                    }
+
+                    GatewayInit = true;
+                    LogController.AddLogMessage(new LogMessage(text: $"{PLCGateway.GetType()} init. and ready to use.", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+                    return true;
+                }
             }
             catch (Exception ex)
             {
