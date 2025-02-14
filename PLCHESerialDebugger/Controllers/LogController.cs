@@ -11,6 +11,8 @@ namespace PLCHESerialDebugger
 
         }
 
+        public List<int> ActivePageNumbers = new List<int>();
+
         public List<LogMessage> BaseLog = new List<LogMessage>();
 
         public List<LogMessage> VISALog = new List<LogMessage>();
@@ -46,6 +48,11 @@ namespace PLCHESerialDebugger
             {
                 case LogMessage.messageType.Base:
                     {
+                        if (message.Text.Contains("\n"))
+                        {
+                            BaseLog.Add(new LogMessage(text: string.Empty, messageType: LogMessage.messageType.Base, timeStamp: DateTime.Now, useTimeStamp: false)); // just to add vertical spacing..
+                        }
+
                         BaseLog.Add(message);
                         SyncSystemBaseDataBindingLog(); // For GUI
                         break;

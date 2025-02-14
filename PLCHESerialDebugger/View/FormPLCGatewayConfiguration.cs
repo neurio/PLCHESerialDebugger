@@ -8,6 +8,8 @@ namespace PLCHESerialDebugger
 
         public PLCGatewayController PLCGatewayController { get; set; }
 
+        public Button btnClearTelemetryMonitor { get; set; }
+
         public Button btnDumpIt900 { get; set; }
 
         public Button btnAddNode { get; set; }
@@ -19,6 +21,8 @@ namespace PLCHESerialDebugger
         public TextBox txtNodeID { get; set; }
 
         public ListBox ListBoxTelemetryMonitor { get; set; }
+
+        public CheckedListBox CheckedListBoxCurrentPageSelection { get; set; }
 
         public Dictionary<int, ListBox> TelemetryListBoxes { get; set; } = new Dictionary<int, ListBox>(); // <NodeID, (associated) ListBox)
 
@@ -110,8 +114,44 @@ namespace PLCHESerialDebugger
             lblTelemetry.Padding = new Padding(2);
             Controls.Add(lblTelemetry);
 
-            ListBoxTelemetryMonitor = FormUtilities.CreateListBox(0.30f, 0.09f, 0.165f, 0.75f, this);
+            ListBoxTelemetryMonitor = FormUtilities.CreateListBox(0.30f, 0.09f, 0.60f, 0.75f, this);
             Controls.Add(ListBoxTelemetryMonitor);
+
+            // === Clear Telemetry Monitor Window Button ===
+            btnClearTelemetryMonitor = FormUtilities.CreateButton("Clear Data", 0.54f, 0.82f, 0.1f, 0.06f, this);
+            btnClearTelemetryMonitor.Click += btnClearTelemetryMonitor_Click;
+            btnClearTelemetryMonitor.Font = new Font("Calibri Light", 14);
+            Controls.Add(btnClearTelemetryMonitor);
+
+            // === Page Selection CheckedListBox ===
+
+            var lblPageSelection = FormUtilities.CreateLabel("Page #", 0.01f, 0.48f, this);
+            lblPageSelection.Font = new Font("Calibri Light", 14, FontStyle.Bold);
+            lblPageSelection.BackColor = Color.Transparent;
+            lblPageSelection.BorderStyle = BorderStyle.Fixed3D;
+            lblPageSelection.Padding = new Padding(2);
+            Controls.Add(lblPageSelection);
+
+            List<int> pageNumbers = new List<int>() { 0, 1, 2, 3, 4 };
+            CheckedListBoxCurrentPageSelection = FormUtilities.CreateCheckedListBox(0.01f, 0.55f, 0.04f, 0.20f, this);
+            CheckedListBoxCurrentPageSelection.Items.AddRange(pageNumbers.Cast<object>().ToArray());
+            CheckedListBoxCurrentPageSelection.ItemCheck += CheckedListBoxCurrentPageSelection_ItemCheck;
+
+            Controls.Add(CheckedListBoxCurrentPageSelection);
+        }
+
+        private async void btnClearTelemetryMonitor_Click(object sender, EventArgs e)
+        {
+            LogController.TelemetryDataBindingLog.Clear();
+        }
+
+        private void CheckedListBoxCurrentPageSelection_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            var checkedListBox = sender as CheckedListBox;
+            if (checkedListBox == null) return;
+
+            // Rebuild the list from checked items
+            LogController.ActivePageNumbers = checkedListBox.CheckedItems.Cast<int>().ToList();
         }
 
         private async void btnDumpIt900_Click(object sender, EventArgs e)

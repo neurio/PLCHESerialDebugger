@@ -56,6 +56,24 @@
             return listBox;
         }
 
+        public static CheckedListBox CreateCheckedListBox(float xRatio, float yRatio, float widthRatio, float heightRatio, Form form)
+        {
+            var checkedListBox = new CheckedListBox
+            {
+                Location = new Point((int)(form.ClientSize.Width * xRatio), (int)(form.ClientSize.Height * yRatio)),
+                Size = new Size((int)(form.ClientSize.Width * widthRatio), (int)(form.ClientSize.Height * heightRatio)),
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.WhiteSmoke,
+                CheckOnClick = true // Allows checking items with a single click
+            };
+
+            // Enable scrolling if items exceed visible area
+            checkedListBox.HorizontalScrollbar = true;
+
+            return checkedListBox;
+        }
+
+
         public static TextBox CreateTextBox(float xRatio, float yRatio, float widthRatio, float heightRatio, Form form)
         {
             var textBox = new TextBox

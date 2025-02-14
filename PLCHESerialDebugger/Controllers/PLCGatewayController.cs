@@ -113,7 +113,9 @@ namespace PLCHESerialDebugger
             
             SendPLCGatewayPacket($"help");
             string result = await RetrievePLCGatewayPacket(isTelemetryPacket: false, msTimeout: 5000);
-            
+            LogController.AddLogMessage(new LogMessage(text: $"{result}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+
+
             if (result != string.Empty)
             {
                 cmdSent = true;
@@ -178,6 +180,7 @@ namespace PLCHESerialDebugger
 
         public void ScanSerialPorts()
         {
+            COMPortsBindingList.Clear();
             List<string> portNames = SerialPort.GetPortNames().ToList();
 
             foreach (string portName in portNames)
@@ -240,7 +243,11 @@ namespace PLCHESerialDebugger
         {
             try
             {
-                LogController.AddLogMessage(new LogMessage(text: $"Closing {PLCGateway.GetType()}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+                if (PLCGateway.CommEstablished || GatewayInit)
+                {
+                    LogController.AddLogMessage(new LogMessage(text: $"Closing {PLCGateway.GetType()}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+                }
+                
                 PLCGateway.Close();
                 GatewayInit = false;
             }
@@ -277,13 +284,13 @@ namespace PLCHESerialDebugger
                 {
                     if (!PLCGateway.CommEstablished)
                     {
-                        LogController.AddLogMessage(new LogMessage(text: $"{PLCGateway.GetType()} init. failed.", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+                        LogController.AddLogMessage(new LogMessage(text: $"{PLCGateway.GetType()} init. failed using COM{SerialPortNumber}.", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
                         GatewayInit = false;
                         return false;
                     }
 
                     GatewayInit = true;
-                    LogController.AddLogMessage(new LogMessage(text: $"{PLCGateway.GetType()} init. and ready to use.", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
+                    LogController.AddLogMessage(new LogMessage(text: $"{PLCGateway.GetType()} init. and ready to use using COM{SerialPortNumber}.", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
                     return true;
                 }
             }

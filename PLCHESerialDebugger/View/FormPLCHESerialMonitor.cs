@@ -274,12 +274,7 @@ namespace PLCHESerialDebugger
         // Timer Tick event handler
         private async void UIUpdateTimer_Tick(object sender, EventArgs e)
         {
-            /// need to add:
-            /// 1. Node ID selection
-            /// 2. Page Number Selection
-            /// 3. Add some logic to iterate over list of known, active node IDs and populate to respective windows.
             /// TODO
-            /// 1. Convert logmessagetype to typetelemetry
             /// 2. create new datagridview for telemetetrydata, store telemetry data into a datatable, each column representing a row from page0 and the value corresponding with each datatable entry.
             ///             THINK MORE ABOUT THE STRUCTURE FOR TELEMETRY DataTable/DataGridView implementation
             /// it is possible to spawn a list box, initialize a databindingsource, attach a string list to databindingsource, etc. at runtime
@@ -288,12 +283,16 @@ namespace PLCHESerialDebugger
             // need some identifier mechanism that allows me to know that this packet is page data
             // this polling task and serial writes can happen around each other.
 
-
+            int nodeNumber = 0; // can worry about changing target node id later or to select multiple nodes to read data
 
             if (PLCGatewayController.PersistentPollingEnabled == true)
             {
-                PLCGatewayController.SendPLCGatewayPacket("plc-page-dump -i2");
-                string returnedData = await PLCGatewayController.RetrievePLCGatewayPacket(isTelemetryPacket: true); // Telemetry Data parsed within AddLogMessage()
+                foreach(int pageNumber in LogController.ActivePageNumbers)
+                {
+                    PLCGatewayController.SendPLCGatewayPacket($"plc-page-dump -p{pageNumber} -i{nodeNumber}");
+                    string returnedData = await PLCGatewayController.RetrievePLCGatewayPacket(isTelemetryPacket: true); // Telemetry Data parsed within AddLogMessage()
+                    // possibly can add messagetype
+                }
                 // string newRXData = PLCGatewayController.ReadAndUpdateInputBuffer(); // Assuming telemetry data is posted cyclically, NOT requested.
             }
         }
@@ -444,11 +443,13 @@ namespace PLCHESerialDebugger
         private async void BtnSetUL1741TestMode_Click(object sender, EventArgs e)
         {
             PLCGatewayController.EnableUL1741TestMode();
+            LogController.AddLogMessage(new LogMessage(text: $"Enabled UL1741 Test Mode", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
         }
 
         private async void BtnSetDCSupplyMode_Click(object sender, EventArgs e)
         {
             PLCGatewayController.EnableDCSupplyMode();
+            LogController.AddLogMessage(new LogMessage(text: $"Enabled DC Supply Mode", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
         }
 
         private async void BtnHelp_Click(object sender, EventArgs e)
