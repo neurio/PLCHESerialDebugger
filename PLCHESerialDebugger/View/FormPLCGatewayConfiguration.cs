@@ -163,14 +163,13 @@ namespace PLCHESerialDebugger
 
         private async void btnAddNode_Click(object sender, EventArgs e)
         {
-            int NodeID = -1;
+            string NodeID = txtNodeID.Text;
 
-            if (txtNodeID.Text.Length > 0)
+            int nodeIDLength = 16;
+
+            if (txtNodeID.Text.Length != nodeIDLength)
             {
-                if (!int.TryParse(txtNodeID.Text, out NodeID))
-                {
-                    LogController.AddLogMessage(new LogMessage(text: $"Invalid Node ID: {txtNodeID.Text}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
-                }
+                LogController.AddLogMessage(new LogMessage(text: $"Invalid Node ID: {txtNodeID.Text}", messageType: LogMessage.messageType.Base, timeStamp: DateTime.UtcNow));
             }
 
             bool addedNode = await PLCGatewayController.AddNode(NodeID);

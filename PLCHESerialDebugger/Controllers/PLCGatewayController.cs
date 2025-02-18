@@ -128,7 +128,7 @@ namespace PLCHESerialDebugger
             return cmdSent;
         }
 
-        public async Task<bool> AddNode(int nodeID)
+        public async Task<bool> AddNode(string nodeID)
         {
             bool success;
             SendPLCGatewayPacket($"it900-node-add {nodeID}");
